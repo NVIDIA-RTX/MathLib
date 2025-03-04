@@ -141,149 +141,55 @@ ML_INLINE double rcp(double x) {
 
 #ifdef ML_NAMESPACE
 
-ML_INLINE float abs(float x) {
-    return ::abs(x);
-}
+#    define ML_STD_ARG1(f, type) \
+        ML_INLINE type f(type x) { \
+            return ::f(x); \
+        }
 
-ML_INLINE double abs(double x) {
-    return ::abs(x);
-}
+#    define ML_STD_ARG2(f, type) \
+        ML_INLINE type f(type x, type y) { \
+            return ::f(x, y); \
+        }
 
-ML_INLINE float floor(float x) {
-    return ::floor(x);
-}
+ML_STD_ARG1(abs, float)
+ML_STD_ARG1(abs, double)
+ML_STD_ARG1(floor, float)
+ML_STD_ARG1(floor, double)
+ML_STD_ARG1(round, float)
+ML_STD_ARG1(round, double)
+ML_STD_ARG1(ceil, float)
+ML_STD_ARG1(ceil, double)
+ML_STD_ARG1(sin, float)
+ML_STD_ARG1(sin, double)
+ML_STD_ARG1(cos, float)
+ML_STD_ARG1(cos, double)
+ML_STD_ARG1(tan, float)
+ML_STD_ARG1(tan, double)
+ML_STD_ARG1(asin, float)
+ML_STD_ARG1(asin, double)
+ML_STD_ARG1(acos, float)
+ML_STD_ARG1(acos, double)
+ML_STD_ARG1(atan, float)
+ML_STD_ARG1(atan, double)
+ML_STD_ARG1(sqrt, float)
+ML_STD_ARG1(sqrt, double)
+ML_STD_ARG1(log, float)
+ML_STD_ARG1(log, double)
+ML_STD_ARG1(log2, float)
+ML_STD_ARG1(log2, double)
+ML_STD_ARG1(exp, float)
+ML_STD_ARG1(exp, double)
+ML_STD_ARG1(exp2, float)
+ML_STD_ARG1(exp2, double)
+ML_STD_ARG2(fmod, float)
+ML_STD_ARG2(fmod, double)
+ML_STD_ARG2(atan2, float)
+ML_STD_ARG2(atan2, double)
+ML_STD_ARG2(pow, float)
+ML_STD_ARG2(pow, double)
 
-ML_INLINE double floor(double x) {
-    return ::floor(x);
-}
-
-ML_INLINE float round(float x) {
-    return ::round(x);
-}
-
-ML_INLINE double round(double x) {
-    return ::round(x);
-}
-
-ML_INLINE float ceil(float x) {
-    return ::ceil(x);
-}
-
-ML_INLINE double ceil(double x) {
-    return ::ceil(x);
-}
-
-ML_INLINE float fmod(float x, float y) {
-    return ::fmod(x, y);
-}
-
-ML_INLINE double fmod(double x, double y) {
-    return ::fmod(x, y);
-}
-
-ML_INLINE float sin(float x) {
-    return ::sin(x);
-}
-
-ML_INLINE double sin(double x) {
-    return ::sin(x);
-}
-
-ML_INLINE float cos(float x) {
-    return ::cos(x);
-}
-
-ML_INLINE double cos(double x) {
-    return ::cos(x);
-}
-
-ML_INLINE float tan(float x) {
-    return ::tan(x);
-}
-
-ML_INLINE double tan(double x) {
-    return ::tan(x);
-}
-
-ML_INLINE float asin(float x) {
-    return ::asin(x);
-}
-
-ML_INLINE double asin(double x) {
-    return ::asin(x);
-}
-
-ML_INLINE float acos(float x) {
-    return ::acos(x);
-}
-
-ML_INLINE double acos(double x) {
-    return ::acos(x);
-}
-
-ML_INLINE float atan(float x) {
-    return ::atan(x);
-}
-
-ML_INLINE double atan(double x) {
-    return ::atan(x);
-}
-
-ML_INLINE float atan2(float y, float x) {
-    return ::atan2(y, x);
-}
-
-ML_INLINE double atan2(double y, double x) {
-    return ::atan2(y, x);
-}
-
-ML_INLINE float sqrt(float x) {
-    return ::sqrt(x);
-}
-
-ML_INLINE double sqrt(double x) {
-    return ::sqrt(x);
-}
-
-ML_INLINE float pow(float x, float y) {
-    return ::pow(x, y);
-}
-
-ML_INLINE double pow(double x, double y) {
-    return ::pow(x, y);
-}
-
-ML_INLINE float log(float x) {
-    return ::log(x);
-}
-
-ML_INLINE double log(double x) {
-    return ::log(x);
-}
-
-ML_INLINE float log2(float x) {
-    return ::log2(x);
-}
-
-ML_INLINE double log2(double x) {
-    return ::log2(x);
-}
-
-ML_INLINE float exp(float x) {
-    return ::exp(x);
-}
-
-ML_INLINE double exp(double x) {
-    return ::exp(x);
-}
-
-ML_INLINE float exp2(float x) {
-    return ::exp2(x);
-}
-
-ML_INLINE double exp2(double x) {
-    return ::exp2(x);
-}
+#undef ML_STD_ARG1
+#undef ML_STD_ARG2
 
 #endif
 

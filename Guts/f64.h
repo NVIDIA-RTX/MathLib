@@ -220,7 +220,7 @@ ML_INLINE double2 normalize(const double2& x) {
 // non-HLSL
 
 ML_INLINE double2 Pi(const double2& mul) {
-    return mul * acosf(-1.0);
+    return mul * acos(-1.0);
 }
 
 ML_INLINE double2 GetPerpendicularVector(const double2& a) {

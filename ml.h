@@ -86,14 +86,10 @@ IMPORTANT:
 
 // Inline preference
 #ifndef ML_INLINE
-#    ifdef _WIN32
-#        define ML_INLINE __forceinline
-#        define ML_ALIGN(alignment, x) __declspec(align(alignment)) x
-#    else
-#        include <unistd.h>
-
+#    if (defined(__GNUC__) || defined(__clang__))
 #        define ML_INLINE __attribute__((always_inline)) inline
-#        define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
+#    else
+#        define ML_INLINE __forceinline
 #    endif
 #endif
 
@@ -106,12 +102,18 @@ IMPORTANT:
 #if defined(__GNUC__)
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+
+#    define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
 #elif defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wstrict-aliasing"
+
+#    define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
 #else
 #    pragma warning(push)
 #    pragma warning(disable : 4201) // nonstandard extension used: nameless struct/union
+
+#    define ML_ALIGN(alignment, x) __declspec(align(alignment)) x
 #endif
 
 // Headers
@@ -120,6 +122,10 @@ IMPORTANT:
 #include <cstdlib> // overloaded abs
 
 #include <stdint.h>
+
+#ifndef _WIN32
+#    include <unistd.h> // TODO: needed?
+#endif
 
 #if (defined(__i386__) || defined(__x86_64__) || defined(__SCE__))
 #    include <x86intrin.h>

@@ -84,6 +84,19 @@ IMPORTANT:
 #    define ML_DEPTH_RANGE_FAR 1.0f
 #endif
 
+// Inline preference
+#ifndef ML_INLINE
+#    ifdef _WIN32
+#        define ML_INLINE __forceinline
+#        define ML_ALIGN(alignment, x) __declspec(align(alignment)) x
+#    else
+#        include <unistd.h>
+
+#        define ML_INLINE __attribute__((always_inline)) inline
+#        define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
+#    endif
+#endif
+
 //======================================================================================================================
 // Macro stuff
 //======================================================================================================================
@@ -99,16 +112,6 @@ IMPORTANT:
 #else
 #    pragma warning(push)
 #    pragma warning(disable : 4201) // nonstandard extension used: nameless struct/union
-#endif
-
-#ifdef _WIN32
-#    define ML_INLINE __forceinline
-#    define ML_ALIGN(alignment, x) __declspec(align(alignment)) x
-#else
-#    include <unistd.h>
-
-#    define ML_INLINE __attribute__((always_inline)) inline
-#    define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
 #endif
 
 // Headers

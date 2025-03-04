@@ -139,6 +139,154 @@ ML_INLINE double rcp(double x) {
     return 1.0 / x;
 }
 
+#ifdef ML_NAMESPACE
+
+ML_INLINE float abs(float x) {
+    return ::abs(x);
+}
+
+ML_INLINE double abs(double x) {
+    return ::abs(x);
+}
+
+ML_INLINE float floor(float x) {
+    return ::floor(x);
+}
+
+ML_INLINE double floor(double x) {
+    return ::floor(x);
+}
+
+ML_INLINE float round(float x) {
+    return ::round(x);
+}
+
+ML_INLINE double round(double x) {
+    return ::round(x);
+}
+
+ML_INLINE float ceil(float x) {
+    return ::ceil(x);
+}
+
+ML_INLINE double ceil(double x) {
+    return ::ceil(x);
+}
+
+ML_INLINE float fmod(float x, float y) {
+    return ::fmod(x, y);
+}
+
+ML_INLINE double fmod(double x, double y) {
+    return ::fmod(x, y);
+}
+
+ML_INLINE float sin(float x) {
+    return ::sin(x);
+}
+
+ML_INLINE double sin(double x) {
+    return ::sin(x);
+}
+
+ML_INLINE float cos(float x) {
+    return ::cos(x);
+}
+
+ML_INLINE double cos(double x) {
+    return ::cos(x);
+}
+
+ML_INLINE float tan(float x) {
+    return ::tan(x);
+}
+
+ML_INLINE double tan(double x) {
+    return ::tan(x);
+}
+
+ML_INLINE float asin(float x) {
+    return ::asin(x);
+}
+
+ML_INLINE double asin(double x) {
+    return ::asin(x);
+}
+
+ML_INLINE float acos(float x) {
+    return ::acos(x);
+}
+
+ML_INLINE double acos(double x) {
+    return ::acos(x);
+}
+
+ML_INLINE float atan(float x) {
+    return ::atan(x);
+}
+
+ML_INLINE double atan(double x) {
+    return ::atan(x);
+}
+
+ML_INLINE float atan2(float y, float x) {
+    return ::atan2(y, x);
+}
+
+ML_INLINE double atan2(double y, double x) {
+    return ::atan2(y, x);
+}
+
+ML_INLINE float sqrt(float x) {
+    return ::sqrt(x);
+}
+
+ML_INLINE double sqrt(double x) {
+    return ::sqrt(x);
+}
+
+ML_INLINE float pow(float x, float y) {
+    return ::pow(x, y);
+}
+
+ML_INLINE double pow(double x, double y) {
+    return ::pow(x, y);
+}
+
+ML_INLINE float log(float x) {
+    return ::log(x);
+}
+
+ML_INLINE double log(double x) {
+    return ::log(x);
+}
+
+ML_INLINE float log2(float x) {
+    return ::log2(x);
+}
+
+ML_INLINE double log2(double x) {
+    return ::log2(x);
+}
+
+ML_INLINE float exp(float x) {
+    return ::exp(x);
+}
+
+ML_INLINE double exp(double x) {
+    return ::exp(x);
+}
+
+ML_INLINE float exp2(float x) {
+    return ::exp2(x);
+}
+
+ML_INLINE double exp2(double x) {
+    return ::exp2(x);
+}
+
+#endif
+
 //======================================================================================================================
 // SVML emulation (part 1)
 //======================================================================================================================

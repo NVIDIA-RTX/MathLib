@@ -49,6 +49,10 @@
 
 #include "../ml.hlsli"
 
+#ifdef ML_NAMESPACE
+namespace ml {
+#endif
+
 void ML_Tests() {
     const uint32_t N = 10000;
     const float R = 10000.0f;
@@ -554,3 +558,7 @@ void ML_Tests() {
         ML_Assert(any(double4(myNan) != double4(myNan)));
     }
 }
+
+#ifdef ML_NAMESPACE
+}
+#endif

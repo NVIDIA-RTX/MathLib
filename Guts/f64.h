@@ -930,11 +930,11 @@ public:
     // Compare
 
     ML_INLINE bool operator==(const double4x4& m) const {
-        return all(double4(col0) == m.col0) && all(double4(col1) == m.col1) && all(double4(col2) == m.col2) && all(double4(col3) == m.col3);
+        return all(double4(col0) == double4(m.col0)) && all(double4(col1) == double4(m.col1)) && all(double4(col2) == double4(m.col2)) && all(double4(col3) == double4(m.col3));
     }
 
     ML_INLINE bool operator!=(const double4x4& m) const {
-        return any(double4(col0) != m.col0) || any(double4(col1) != m.col1) || any(double4(col2) != m.col2) || any(double4(col3) != m.col3);
+        return any(double4(col0) != double4(m.col0)) || any(double4(col1) != double4(m.col1)) || any(double4(col2) != double4(m.col2)) || any(double4(col3) != double4(m.col3));
     }
 
     // NOTE: *

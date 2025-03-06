@@ -3,7 +3,7 @@
 /*
 IMPORTANT:
 - intrinsic related headers must not be included *AFTER* ML inclusion
-- "ML_NAMESPACE" macro can be defined to put the entire ML into "ml" namespace
+- "ML_NAMESPACE" macro can be defined to wrap the entire ML into "ml" namespace
 - sizeof(3-component vector) == sizeof(4-component vector) because of SSE
 */
 
@@ -27,6 +27,11 @@ IMPORTANT:
 // Settings
 //======================================================================================================================
 
+// Can be set to wrap the library into "ml" namespace
+#ifndef ML_NAMESPACE
+// #define ML_NAMESPACE
+#endif
+
 // Allowed HW intrinsics (emulated if not supported)
 #ifndef ML_INTRINSIC_LEVEL // see above
 #    if defined(__AVX2__)
@@ -42,37 +47,36 @@ IMPORTANT:
 
 // SVML availability
 #ifndef ML_SVML_AVAILABLE
-#    define ML_SVML_AVAILABLE (_MSC_VER >= 1920 && __clang__ == 0) // only MSVC 2019+ supports Intel's SVML
-#endif
-
-// Can be set in the project settings to wrap the library into namespace "ml". Can be applied to "ml.hlsli" too
-#ifndef ML_NAMESPACE
-// #define ML_NAMESPACE
+#    if defined(__arm__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM)
+#        define ML_SVML_AVAILABLE 0
+#    else
+#        define ML_SVML_AVAILABLE (_MSC_VER >= 1920 && __clang__ == 0)
+#    endif
 #endif
 
 // More precision (a little bit slower)
 #ifndef ML_NEWTONRAPHSON_APROXIMATION
-#    define ML_NEWTONRAPHSON_APROXIMATION
+#    define ML_NEWTONRAPHSON_APROXIMATION 1
 #endif
 
-// Only for debugging (not need if you are accurate in horizontal operations)
+// Only for debugging (useful to debug issues in horizontal operations)
 #ifndef ML_CHECK_W_IS_ZERO
-// #define ML_CHECK_W_IS_ZERO
+#    define ML_CHECK_W_IS_ZERO 0
 #endif
 
 // Only for debugging (generate exeptions in rounding operations, only for SSE4)
 #ifndef ML_EXEPTIONS
-// #define ML_EXEPTIONS
+#    define ML_EXEPTIONS 0
 #endif
 
 // Reversed depth
 #ifndef ML_DEPTH_REVERSED
-#    define ML_DEPTH_REVERSED
+#    define ML_DEPTH_REVERSED 1
 #endif
 
 // Can be handy for classic OpenGL
 #ifndef ML_OGL
-// #define ML_OGL
+#    define ML_OGL 0
 #endif
 
 // Depth range
@@ -148,7 +152,7 @@ IMPORTANT:
 #define ML_Stringify_(token) #token
 #define ML_Stringify(token) ML_Stringify_(token)
 
-#ifdef ML_EXEPTIONS
+#if ML_EXEPTIONS
 #    define ML_ROUNDING_EXEPTIONS_MASK _MM_FROUND_RAISE_EXC
 #else
 #    define ML_ROUNDING_EXEPTIONS_MASK _MM_FROUND_NO_EXC
@@ -170,7 +174,7 @@ IMPORTANT:
 
 // Normalized device coordinates
 
-#ifdef ML_OGL // Depth range [-1; 1], origin "lower left"
+#if ML_OGL // Depth range [-1; 1], origin "lower left"
 #    define ML_NDC_NEAR_NO_REVERSE -1.0f
 #    define ML_DEPTH_C0 (0.5f * (ML_DEPTH_RANGE_FAR - ML_DEPTH_RANGE_NEAR))
 #    define ML_DEPTH_C1 (0.5f * (ML_DEPTH_RANGE_FAR + ML_DEPTH_RANGE_NEAR))
@@ -194,7 +198,7 @@ ML_INLINE T ML_ModifyProjZ(bool isReversed, T c2, T c3) {
 
 #define ML_NDC_FAR_NO_REVERSE 1.0f
 
-#ifdef ML_DEPTH_REVERSED
+#if ML_DEPTH_REVERSED
 #    define ML_NDC_NEAR ML_NDC_FAR_NO_REVERSE
 #    define ML_NDC_FAR ML_NDC_NEAR_NO_REVERSE
 #    define ML_DEPTH_EPS -1e-7f

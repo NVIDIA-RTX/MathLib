@@ -330,7 +330,7 @@ const v4f c_v4f_FFF0 = _mm_castsi128_ps(_mm_setr_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0
 #define _v4f_is_nan(x) _mm_cmpneq_ps(x, x)
 #define _v4f_is_inf2(x, y) _mm_and_ps(_v4f_is_inf(x), _mm_or_ps(_mm_and_ps(x, c_v4f_Sign), y))
 
-#ifdef ML_CHECK_W_IS_ZERO
+#if ML_CHECK_W_IS_ZERO
 
 ML_INLINE bool v4f_is_w_zero(const v4f& x) {
     v4f t = _mm_cmpeq_ps(x, _mm_setzero_ps());
@@ -407,7 +407,7 @@ ML_INLINE v4f v4f_cross(const v4f& x, const v4f& y) {
 }
 
 ML_INLINE v4f v4f_rsqrt(const v4f& r) {
-#ifdef ML_NEWTONRAPHSON_APROXIMATION
+#if ML_NEWTONRAPHSON_APROXIMATION
 
     v4f c = _mm_rsqrt_ps(r);
     v4f a = _mm_mul_ps(c, _mm_set1_ps(0.5f));
@@ -424,7 +424,7 @@ ML_INLINE v4f v4f_rsqrt(const v4f& r) {
 }
 
 ML_INLINE v4f v4f_rcp(const v4f& r) {
-#ifdef ML_NEWTONRAPHSON_APROXIMATION
+#if ML_NEWTONRAPHSON_APROXIMATION
 
     v4f c = _mm_rcp_ps(r);
     v4f a = _mm_mul_ps(c, r);
@@ -537,7 +537,7 @@ const v4d c_v4d_FFF0 = _mm256_castsi256_pd(_mm256_setr_epi32(0xFFFFFFFF, 0xFFFFF
 #define _v4d_is_nan(x) _mm256_cmpneq_pd(x, x)
 #define _v4d_is_inf2(x, y) _mm256_and_pd(_v4d_is_inf(x), _mm256_or_pd(_mm256_and_pd(x, c_v4d_Sign), y))
 
-#ifdef ML_CHECK_W_IS_ZERO
+#if ML_CHECK_W_IS_ZERO
 
 ML_INLINE bool v4d_is_w_zero(const v4d& x) {
     v4d t = _mm256_cmpeq_pd(x, _mm256_setzero_pd());
@@ -636,7 +636,7 @@ ML_INLINE v4d v4d_cross(const v4d& x, const v4d& y) {
 ML_INLINE v4d v4d_rsqrt(const v4d& r) {
     v4d c = _mm256_div_pd(c_v4d_1111, _mm256_sqrt_pd(r));
 
-#ifdef ML_NEWTONRAPHSON_APROXIMATION
+#if ML_NEWTONRAPHSON_APROXIMATION
 
     v4d a = _mm256_mul_pd(c, _mm256_set1_pd(0.5));
     v4d t = _mm256_mul_pd(r, c);
@@ -654,7 +654,7 @@ ML_INLINE v4d v4d_rsqrt(const v4d& r) {
 ML_INLINE v4d v4d_rcp(const v4d& r) {
     v4d c = _mm256_div_pd(c_v4d_1111, r);
 
-#ifdef ML_NEWTONRAPHSON_APROXIMATION
+#if ML_NEWTONRAPHSON_APROXIMATION
 
     v4d a = _mm256_mul_pd(c, r);
     v4d b = _mm256_add_pd(c, c);

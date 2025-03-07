@@ -10,8 +10,8 @@ IMPORTANT:
 #pragma once
 
 #define ML_VERSION_MAJOR 1
-#define ML_VERSION_MINOR 1
-#define ML_VERSION_DATE "5 February 2025"
+#define ML_VERSION_MINOR 2
+#define ML_VERSION_DATE "7 March 2025"
 
 //======================================================================================================================
 // Constants
@@ -1158,6 +1158,6 @@ ML_INLINE void DecomposeProjection(eStyle originStyle, eStyle depthStyle, const 
 #    pragma GCC diagnostic pop
 #elif defined(__clang__)
 #    pragma clang diagnostic pop
-#elif defined(MSVC)
+#else
 #    pragma warning(pop)
 #endif

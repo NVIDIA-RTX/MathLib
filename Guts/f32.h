@@ -843,21 +843,12 @@ ML_INLINE float4 Slerp(const float4& a, const float4& b, float x) {
 
 // IMPORTANT: store - "column-major", usage - "row-major" (vector is a column)
 union float4x4 {
-#if defined(__GNUC__)
-    struct {
-        v4f col0;
-        v4f col1;
-        v4f col2;
-        v4f col3;
-    };
-#else
     struct {
         float4 col0;
         float4 col1;
         float4 col2;
         float4 col3;
     };
-#endif
 
     struct {
         float4 cols[4];

@@ -843,60 +843,58 @@ ML_INLINE float4 Slerp(const float4& a, const float4& b, float x) {
 
 // IMPORTANT: store - "column-major", usage - "row-major" (vector is a column)
 union float4x4 {
+    // Column array
     struct {
-        float4 col0;
-        float4 col1;
-        float4 col2;
-        float4 col3;
+        float4 ca[COORD_4D];
+
+        /*
+        TODO: at least older GCC version don't allow this:
+
+        float4 c0;
+        float4 c1;
+        float4 c2;
+        float4 c3;
+
+        because of this errors:
+         - member with constructor not allowed in anonymous aggregate
+         - member with copy assignment operator not allowed in anonymous aggregate
+        */
     };
 
+    // Element array
     struct {
-        float4 cols[4];
+        float a[COORD_4D * COORD_4D];
     };
 
+    // Elements aXY, where X - row, Y - column
     struct {
-        float a[16];
-    };
-
-    struct {
-        struct {
-            float a00, a10, a20, a30;
-        };
-
-        struct {
-            float a01, a11, a21, a31;
-        };
-
-        struct {
-            float a02, a12, a22, a32;
-        };
-
-        struct {
-            float a03, a13, a23, a33;
-        };
+        float a00, a10, a20, a30;
+        float a01, a11, a21, a31;
+        float a02, a12, a22, a32;
+        float a03, a13, a23, a33;
     };
 
 public:
     ML_INLINE float4x4() {
-        col0 = _mm_setzero_ps();
-        col1 = _mm_setzero_ps();
-        col2 = _mm_setzero_ps();
-        col3 = _mm_setzero_ps();
+        ca[0] = _mm_setzero_ps();
+        ca[1] = _mm_setzero_ps();
+        ca[2] = _mm_setzero_ps();
+        ca[3] = _mm_setzero_ps();
     }
 
     ML_INLINE float4x4(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31,
         float m32, float m33) {
-        col0 = v4f_set(m00, m10, m20, m30);
-        col1 = v4f_set(m01, m11, m21, m31);
-        col2 = v4f_set(m02, m12, m22, m32);
-        col3 = v4f_set(m03, m13, m23, m33);
+        ca[0] = v4f_set(m00, m10, m20, m30);
+        ca[1] = v4f_set(m01, m11, m21, m31);
+        ca[2] = v4f_set(m02, m12, m22, m32);
+        ca[3] = v4f_set(m03, m13, m23, m33);
     }
 
     ML_INLINE float4x4(const float4& c0, const float4& c1, const float4& c2, const float4& c3) {
-        col0 = c0;
-        col1 = c1;
-        col2 = c2;
-        col3 = c3;
+        ca[0] = c0;
+        ca[1] = c1;
+        ca[2] = c2;
+        ca[3] = c3;
     }
 
     ML_INLINE float4x4(const float4x4& m) = default;
@@ -904,10 +902,10 @@ public:
     // Set
 
     ML_INLINE void operator=(const float4x4& m) {
-        col0 = m.col0;
-        col1 = m.col1;
-        col2 = m.col2;
-        col3 = m.col3;
+        ca[0] = m.ca[0];
+        ca[1] = m.ca[1];
+        ca[2] = m.ca[2];
+        ca[3] = m.ca[3];
     }
 
     // Conversion
@@ -917,11 +915,11 @@ public:
     // Compare
 
     ML_INLINE bool operator==(const float4x4& m) const {
-        return all(float4(col0) == float4(m.col0)) && all(float4(col1) == float4(m.col1)) && all(float4(col2) == float4(m.col2)) && all(float4(col3) == float4(m.col3));
+        return all(float4(ca[0]) == float4(m.ca[0])) && all(float4(ca[1]) == float4(m.ca[1])) && all(float4(ca[2]) == float4(m.ca[2])) && all(float4(ca[3]) == float4(m.ca[3]));
     }
 
     ML_INLINE bool operator!=(const float4x4& m) const {
-        return any(float4(col0) != float4(m.col0)) || any(float4(col1) != float4(m.col1)) || any(float4(col2) != float4(m.col2)) || any(float4(col3) != float4(m.col3));
+        return any(float4(ca[0]) != float4(m.ca[0])) || any(float4(ca[1]) != float4(m.ca[1])) || any(float4(ca[2]) != float4(m.ca[2])) || any(float4(ca[3]) != float4(m.ca[3]));
     }
 
     // NOTE: *
@@ -929,84 +927,84 @@ public:
     ML_INLINE float4x4 operator*(const float4x4& m) const {
         float4x4 r;
 
-        v4f r1 = _mm_mul_ps(v4f_swizzle(m.col0, 0, 0, 0, 0), col0);
-        v4f r2 = _mm_mul_ps(v4f_swizzle(m.col1, 0, 0, 0, 0), col0);
+        v4f r1 = _mm_mul_ps(v4f_swizzle(m.ca[0], 0, 0, 0, 0), ca[0]);
+        v4f r2 = _mm_mul_ps(v4f_swizzle(m.ca[1], 0, 0, 0, 0), ca[0]);
 
-        r1 = _mm_fmadd_ps(v4f_swizzle(m.col0, 1, 1, 1, 1), col1, r1);
-        r2 = _mm_fmadd_ps(v4f_swizzle(m.col1, 1, 1, 1, 1), col1, r2);
-        r1 = _mm_fmadd_ps(v4f_swizzle(m.col0, 2, 2, 2, 2), col2, r1);
-        r2 = _mm_fmadd_ps(v4f_swizzle(m.col1, 2, 2, 2, 2), col2, r2);
-        r1 = _mm_fmadd_ps(v4f_swizzle(m.col0, 3, 3, 3, 3), col3, r1);
-        r2 = _mm_fmadd_ps(v4f_swizzle(m.col1, 3, 3, 3, 3), col3, r2);
+        r1 = _mm_fmadd_ps(v4f_swizzle(m.ca[0], 1, 1, 1, 1), ca[1], r1);
+        r2 = _mm_fmadd_ps(v4f_swizzle(m.ca[1], 1, 1, 1, 1), ca[1], r2);
+        r1 = _mm_fmadd_ps(v4f_swizzle(m.ca[0], 2, 2, 2, 2), ca[2], r1);
+        r2 = _mm_fmadd_ps(v4f_swizzle(m.ca[1], 2, 2, 2, 2), ca[2], r2);
+        r1 = _mm_fmadd_ps(v4f_swizzle(m.ca[0], 3, 3, 3, 3), ca[3], r1);
+        r2 = _mm_fmadd_ps(v4f_swizzle(m.ca[1], 3, 3, 3, 3), ca[3], r2);
 
-        r.col0 = r1;
-        r.col1 = r2;
+        r.ca[0] = r1;
+        r.ca[1] = r2;
 
-        r1 = _mm_mul_ps(v4f_swizzle(m.col2, 0, 0, 0, 0), col0);
-        r2 = _mm_mul_ps(v4f_swizzle(m.col3, 0, 0, 0, 0), col0);
+        r1 = _mm_mul_ps(v4f_swizzle(m.ca[2], 0, 0, 0, 0), ca[0]);
+        r2 = _mm_mul_ps(v4f_swizzle(m.ca[3], 0, 0, 0, 0), ca[0]);
 
-        r1 = _mm_fmadd_ps(v4f_swizzle(m.col2, 1, 1, 1, 1), col1, r1);
-        r2 = _mm_fmadd_ps(v4f_swizzle(m.col3, 1, 1, 1, 1), col1, r2);
-        r1 = _mm_fmadd_ps(v4f_swizzle(m.col2, 2, 2, 2, 2), col2, r1);
-        r2 = _mm_fmadd_ps(v4f_swizzle(m.col3, 2, 2, 2, 2), col2, r2);
-        r1 = _mm_fmadd_ps(v4f_swizzle(m.col2, 3, 3, 3, 3), col3, r1);
-        r2 = _mm_fmadd_ps(v4f_swizzle(m.col3, 3, 3, 3, 3), col3, r2);
+        r1 = _mm_fmadd_ps(v4f_swizzle(m.ca[2], 1, 1, 1, 1), ca[1], r1);
+        r2 = _mm_fmadd_ps(v4f_swizzle(m.ca[3], 1, 1, 1, 1), ca[1], r2);
+        r1 = _mm_fmadd_ps(v4f_swizzle(m.ca[2], 2, 2, 2, 2), ca[2], r1);
+        r2 = _mm_fmadd_ps(v4f_swizzle(m.ca[3], 2, 2, 2, 2), ca[2], r2);
+        r1 = _mm_fmadd_ps(v4f_swizzle(m.ca[2], 3, 3, 3, 3), ca[3], r1);
+        r2 = _mm_fmadd_ps(v4f_swizzle(m.ca[3], 3, 3, 3, 3), ca[3], r2);
 
-        r.col2 = r1;
-        r.col3 = r2;
+        r.ca[2] = r1;
+        r.ca[3] = r2;
 
         return r;
     }
 
     ML_INLINE float4 operator*(const float4& v) const {
-        v4f r = _mm_mul_ps(v4f_swizzle(v.xmm, 0, 0, 0, 0), col0);
-        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 1, 1, 1, 1), col1, r);
-        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 2, 2, 2, 2), col2, r);
-        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 3, 3, 3, 3), col3, r);
+        v4f r = _mm_mul_ps(v4f_swizzle(v.xmm, 0, 0, 0, 0), ca[0]);
+        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 1, 1, 1, 1), ca[1], r);
+        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 2, 2, 2, 2), ca[2], r);
+        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 3, 3, 3, 3), ca[3], r);
 
         return r;
     }
 
     ML_INLINE float3 operator*(const float3& v) const {
-        v4f r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 0, 0, 0, 0), col0, col3);
-        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 1, 1, 1, 1), col1, r);
-        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 2, 2, 2, 2), col2, r);
+        v4f r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 0, 0, 0, 0), ca[0], ca[3]);
+        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 1, 1, 1, 1), ca[1], r);
+        r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 2, 2, 2, 2), ca[2], r);
 
         return r;
+    }
+
+    // Columns and rows
+
+    float4& Col(uint32_t column) {
+        ML_Assert(column < COORD_4D);
+
+        return ca[column];
+    }
+
+    const float4& Col(uint32_t column) const {
+        ML_Assert(column < COORD_4D);
+
+        return ca[column];
+    }
+
+    float4& operator[](uint32_t column) {
+        return Col(column);
+    }
+
+    const float4& operator[](uint32_t column) const {
+        return Col(column);
+    }
+
+    ML_INLINE float4 Row(uint32_t row) const {
+        ML_Assert(row < COORD_4D);
+
+        return float4(a[row], a[COORD_4D + row], a[COORD_4D * 2 + row], a[COORD_4D * 3 + row]);
     }
 
     // NOTE: other
 
     static ML_INLINE float4x4 Identity() {
         return float4x4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-    }
-
-    float4& operator[](uint32_t col) {
-        ML_Assert(col < 4);
-
-        return cols[col];
-    }
-
-    const float4& operator[](uint32_t col) const {
-        ML_Assert(col < 4);
-
-        return cols[col];
-    }
-
-    ML_INLINE float4 GetRow0() const {
-        return float4(a00, a01, a02, a03);
-    }
-
-    ML_INLINE float4 GetRow1() const {
-        return float4(a10, a11, a12, a13);
-    }
-
-    ML_INLINE float4 GetRow2() const {
-        return float4(a20, a21, a22, a23);
-    }
-
-    ML_INLINE float4 GetRow3() const {
-        return float4(a30, a31, a32, a33);
     }
 
     ML_INLINE float GetNdcDepth(float z) const {
@@ -1053,25 +1051,25 @@ public:
     }
 
     ML_INLINE float3 GetScale() const {
-        float3 scale = float3(_mm_cvtss_f32(v4f_length(col0)), _mm_cvtss_f32(v4f_length(col1)), _mm_cvtss_f32(v4f_length(col2)));
+        float3 scale = float3(_mm_cvtss_f32(v4f_length(ca[0])), _mm_cvtss_f32(v4f_length(ca[1])), _mm_cvtss_f32(v4f_length(ca[2])));
 
         return scale;
     }
 
     ML_INLINE void SetTranslation(const float3& p) {
-        col3 = v4f_setw1(p.xmm);
+        ca[3] = v4f_setw1(p.xmm);
     }
 
     ML_INLINE void AddTranslation(const float3& p) {
-        col3 = _mm_add_ps(col3, v4f_setw0(p.xmm));
+        ca[3] = _mm_add_ps(ca[3], v4f_setw0(p.xmm));
     }
 
     ML_INLINE void PreTranslation(const float3& p);
 
     ML_INLINE void AddScale(const float3& scale) {
-        col0 = _mm_mul_ps(col0, scale.xmm);
-        col1 = _mm_mul_ps(col1, scale.xmm);
-        col2 = _mm_mul_ps(col2, scale.xmm);
+        ca[0] = _mm_mul_ps(ca[0], scale.xmm);
+        ca[1] = _mm_mul_ps(ca[1], scale.xmm);
+        ca[2] = _mm_mul_ps(ca[2], scale.xmm);
     }
 
     ML_INLINE void WorldToView(uint32_t uiProjFlags = 0) {
@@ -1082,10 +1080,10 @@ public:
         InvertOrtho();
         */
 
-        Swap(col1, col2);
+        Swap(ca[1], ca[2]);
 
         if ((uiProjFlags & PROJ_LEFT_HANDED) == 0)
-            col2 = v4f_negate(col2);
+            ca[2] = v4f_negate(ca[2]);
 
         Transpose3x4();
     }
@@ -1094,50 +1092,50 @@ public:
         Transpose3x4();
 
         if ((uiProjFlags & PROJ_LEFT_HANDED) == 0)
-            col2 = v4f_negate(col2);
+            ca[2] = v4f_negate(ca[2]);
 
-        Swap(col1, col2);
+        Swap(ca[1], ca[2]);
     }
 
     ML_INLINE bool IsLeftHanded() const {
-        float3 v1 = cross(float3(col0), float3(col1));
+        float3 v1 = cross(float3(ca[0]), float3(ca[1]));
 
-        return dot(v1, float3(col2)) < 0.0f;
+        return dot(v1, float3(ca[2])) < 0.0f;
     }
 
     ML_INLINE void TransposeTo(float4x4& m) const {
-        v4f xmm0 = v4f_Ax_Bx_Ay_By(col0, col1);
-        v4f xmm1 = v4f_Ax_Bx_Ay_By(col2, col3);
-        v4f xmm2 = v4f_Az_Bz_Aw_Bw(col0, col1);
-        v4f xmm3 = v4f_Az_Bz_Aw_Bw(col2, col3);
+        v4f xmm0 = v4f_Ax_Bx_Ay_By(ca[0], ca[1]);
+        v4f xmm1 = v4f_Ax_Bx_Ay_By(ca[2], ca[3]);
+        v4f xmm2 = v4f_Az_Bz_Aw_Bw(ca[0], ca[1]);
+        v4f xmm3 = v4f_Az_Bz_Aw_Bw(ca[2], ca[3]);
 
-        m.col0 = v4f_Axy_Bxy(xmm0, xmm1);
-        m.col1 = v4f_Azw_Bzw(xmm1, xmm0);
-        m.col2 = v4f_Axy_Bxy(xmm2, xmm3);
-        m.col3 = v4f_Azw_Bzw(xmm3, xmm2);
+        m.ca[0] = v4f_Axy_Bxy(xmm0, xmm1);
+        m.ca[1] = v4f_Azw_Bzw(xmm1, xmm0);
+        m.ca[2] = v4f_Axy_Bxy(xmm2, xmm3);
+        m.ca[3] = v4f_Azw_Bzw(xmm3, xmm2);
     }
 
     ML_INLINE void Transpose() {
-        v4f xmm0 = v4f_Ax_Bx_Ay_By(col0, col1);
-        v4f xmm1 = v4f_Ax_Bx_Ay_By(col2, col3);
-        v4f xmm2 = v4f_Az_Bz_Aw_Bw(col0, col1);
-        v4f xmm3 = v4f_Az_Bz_Aw_Bw(col2, col3);
+        v4f xmm0 = v4f_Ax_Bx_Ay_By(ca[0], ca[1]);
+        v4f xmm1 = v4f_Ax_Bx_Ay_By(ca[2], ca[3]);
+        v4f xmm2 = v4f_Az_Bz_Aw_Bw(ca[0], ca[1]);
+        v4f xmm3 = v4f_Az_Bz_Aw_Bw(ca[2], ca[3]);
 
-        col0 = v4f_Axy_Bxy(xmm0, xmm1);
-        col1 = v4f_Azw_Bzw(xmm1, xmm0);
-        col2 = v4f_Axy_Bxy(xmm2, xmm3);
-        col3 = v4f_Azw_Bzw(xmm3, xmm2);
+        ca[0] = v4f_Axy_Bxy(xmm0, xmm1);
+        ca[1] = v4f_Azw_Bzw(xmm1, xmm0);
+        ca[2] = v4f_Axy_Bxy(xmm2, xmm3);
+        ca[3] = v4f_Azw_Bzw(xmm3, xmm2);
     }
 
     ML_INLINE void Transpose3x4() {
-        v4f xmm0 = v4f_Ax_Bx_Ay_By(col0, col1);
-        v4f xmm1 = v4f_Ax_Bx_Ay_By(col2, col3);
-        v4f xmm2 = v4f_Az_Bz_Aw_Bw(col0, col1);
-        v4f xmm3 = v4f_Az_Bz_Aw_Bw(col2, col3);
+        v4f xmm0 = v4f_Ax_Bx_Ay_By(ca[0], ca[1]);
+        v4f xmm1 = v4f_Ax_Bx_Ay_By(ca[2], ca[3]);
+        v4f xmm2 = v4f_Az_Bz_Aw_Bw(ca[0], ca[1]);
+        v4f xmm3 = v4f_Az_Bz_Aw_Bw(ca[2], ca[3]);
 
-        col0 = v4f_Axy_Bxy(xmm0, xmm1);
-        col1 = v4f_Azw_Bzw(xmm1, xmm0);
-        col2 = v4f_Axy_Bxy(xmm2, xmm3);
+        ca[0] = v4f_Axy_Bxy(xmm0, xmm1);
+        ca[1] = v4f_Azw_Bzw(xmm1, xmm0);
+        ca[2] = v4f_Axy_Bxy(xmm2, xmm3);
     }
 
     ML_INLINE void Invert() {
@@ -1145,13 +1143,13 @@ public:
 
         v4f Fac0;
         {
-            v4f Swp0a = v4f_shuffle(col3, col2, 3, 3, 3, 3);
-            v4f Swp0b = v4f_shuffle(col3, col2, 2, 2, 2, 2);
+            v4f Swp0a = v4f_shuffle(ca[3], ca[2], 3, 3, 3, 3);
+            v4f Swp0b = v4f_shuffle(ca[3], ca[2], 2, 2, 2, 2);
 
-            v4f Swp00 = v4f_shuffle(col2, col1, 2, 2, 2, 2);
+            v4f Swp00 = v4f_shuffle(ca[2], ca[1], 2, 2, 2, 2);
             v4f Swp01 = v4f_swizzle(Swp0a, 0, 0, 0, 2);
             v4f Swp02 = v4f_swizzle(Swp0b, 0, 0, 0, 2);
-            v4f Swp03 = v4f_shuffle(col2, col1, 3, 3, 3, 3);
+            v4f Swp03 = v4f_shuffle(ca[2], ca[1], 3, 3, 3, 3);
 
             v4f Mul00 = _mm_mul_ps(Swp00, Swp01);
 
@@ -1160,13 +1158,13 @@ public:
 
         v4f Fac1;
         {
-            v4f Swp0a = v4f_shuffle(col3, col2, 3, 3, 3, 3);
-            v4f Swp0b = v4f_shuffle(col3, col2, 1, 1, 1, 1);
+            v4f Swp0a = v4f_shuffle(ca[3], ca[2], 3, 3, 3, 3);
+            v4f Swp0b = v4f_shuffle(ca[3], ca[2], 1, 1, 1, 1);
 
-            v4f Swp00 = v4f_shuffle(col2, col1, 1, 1, 1, 1);
+            v4f Swp00 = v4f_shuffle(ca[2], ca[1], 1, 1, 1, 1);
             v4f Swp01 = v4f_swizzle(Swp0a, 0, 0, 0, 2);
             v4f Swp02 = v4f_swizzle(Swp0b, 0, 0, 0, 2);
-            v4f Swp03 = v4f_shuffle(col2, col1, 3, 3, 3, 3);
+            v4f Swp03 = v4f_shuffle(ca[2], ca[1], 3, 3, 3, 3);
 
             v4f Mul00 = _mm_mul_ps(Swp00, Swp01);
 
@@ -1175,13 +1173,13 @@ public:
 
         v4f Fac2;
         {
-            v4f Swp0a = v4f_shuffle(col3, col2, 2, 2, 2, 2);
-            v4f Swp0b = v4f_shuffle(col3, col2, 1, 1, 1, 1);
+            v4f Swp0a = v4f_shuffle(ca[3], ca[2], 2, 2, 2, 2);
+            v4f Swp0b = v4f_shuffle(ca[3], ca[2], 1, 1, 1, 1);
 
-            v4f Swp00 = v4f_shuffle(col2, col1, 1, 1, 1, 1);
+            v4f Swp00 = v4f_shuffle(ca[2], ca[1], 1, 1, 1, 1);
             v4f Swp01 = v4f_swizzle(Swp0a, 0, 0, 0, 2);
             v4f Swp02 = v4f_swizzle(Swp0b, 0, 0, 0, 2);
-            v4f Swp03 = v4f_shuffle(col2, col1, 2, 2, 2, 2);
+            v4f Swp03 = v4f_shuffle(ca[2], ca[1], 2, 2, 2, 2);
 
             v4f Mul00 = _mm_mul_ps(Swp00, Swp01);
 
@@ -1190,13 +1188,13 @@ public:
 
         v4f Fac3;
         {
-            v4f Swp0a = v4f_shuffle(col3, col2, 3, 3, 3, 3);
-            v4f Swp0b = v4f_shuffle(col3, col2, 0, 0, 0, 0);
+            v4f Swp0a = v4f_shuffle(ca[3], ca[2], 3, 3, 3, 3);
+            v4f Swp0b = v4f_shuffle(ca[3], ca[2], 0, 0, 0, 0);
 
-            v4f Swp00 = v4f_shuffle(col2, col1, 0, 0, 0, 0);
+            v4f Swp00 = v4f_shuffle(ca[2], ca[1], 0, 0, 0, 0);
             v4f Swp01 = v4f_swizzle(Swp0a, 0, 0, 0, 2);
             v4f Swp02 = v4f_swizzle(Swp0b, 0, 0, 0, 2);
-            v4f Swp03 = v4f_shuffle(col2, col1, 3, 3, 3, 3);
+            v4f Swp03 = v4f_shuffle(ca[2], ca[1], 3, 3, 3, 3);
 
             v4f Mul00 = _mm_mul_ps(Swp00, Swp01);
 
@@ -1205,13 +1203,13 @@ public:
 
         v4f Fac4;
         {
-            v4f Swp0a = v4f_shuffle(col3, col2, 2, 2, 2, 2);
-            v4f Swp0b = v4f_shuffle(col3, col2, 0, 0, 0, 0);
+            v4f Swp0a = v4f_shuffle(ca[3], ca[2], 2, 2, 2, 2);
+            v4f Swp0b = v4f_shuffle(ca[3], ca[2], 0, 0, 0, 0);
 
-            v4f Swp00 = v4f_shuffle(col2, col1, 0, 0, 0, 0);
+            v4f Swp00 = v4f_shuffle(ca[2], ca[1], 0, 0, 0, 0);
             v4f Swp01 = v4f_swizzle(Swp0a, 0, 0, 0, 2);
             v4f Swp02 = v4f_swizzle(Swp0b, 0, 0, 0, 2);
-            v4f Swp03 = v4f_shuffle(col2, col1, 2, 2, 2, 2);
+            v4f Swp03 = v4f_shuffle(ca[2], ca[1], 2, 2, 2, 2);
 
             v4f Mul00 = _mm_mul_ps(Swp00, Swp01);
 
@@ -1220,13 +1218,13 @@ public:
 
         v4f Fac5;
         {
-            v4f Swp0a = v4f_shuffle(col3, col2, 1, 1, 1, 1);
-            v4f Swp0b = v4f_shuffle(col3, col2, 0, 0, 0, 0);
+            v4f Swp0a = v4f_shuffle(ca[3], ca[2], 1, 1, 1, 1);
+            v4f Swp0b = v4f_shuffle(ca[3], ca[2], 0, 0, 0, 0);
 
-            v4f Swp00 = v4f_shuffle(col2, col1, 0, 0, 0, 0);
+            v4f Swp00 = v4f_shuffle(ca[2], ca[1], 0, 0, 0, 0);
             v4f Swp01 = v4f_swizzle(Swp0a, 0, 0, 0, 2);
             v4f Swp02 = v4f_swizzle(Swp0b, 0, 0, 0, 2);
-            v4f Swp03 = v4f_shuffle(col2, col1, 1, 1, 1, 1);
+            v4f Swp03 = v4f_shuffle(ca[2], ca[1], 1, 1, 1, 1);
 
             v4f Mul00 = _mm_mul_ps(Swp00, Swp01);
 
@@ -1236,16 +1234,16 @@ public:
         v4f SignA = _mm_set_ps(1.0f, -1.0f, 1.0f, -1.0f);
         v4f SignB = _mm_set_ps(-1.0f, 1.0f, -1.0f, 1.0f);
 
-        v4f Temp0 = v4f_shuffle(col1, col0, 0, 0, 0, 0);
+        v4f Temp0 = v4f_shuffle(ca[1], ca[0], 0, 0, 0, 0);
         v4f Vec0 = v4f_swizzle(Temp0, 0, 2, 2, 2);
 
-        v4f Temp1 = v4f_shuffle(col1, col0, 1, 1, 1, 1);
+        v4f Temp1 = v4f_shuffle(ca[1], ca[0], 1, 1, 1, 1);
         v4f Vec1 = v4f_swizzle(Temp1, 0, 2, 2, 2);
 
-        v4f Temp2 = v4f_shuffle(col1, col0, 2, 2, 2, 2);
+        v4f Temp2 = v4f_shuffle(ca[1], ca[0], 2, 2, 2, 2);
         v4f Vec2 = v4f_swizzle(Temp2, 0, 2, 2, 2);
 
-        v4f Temp3 = v4f_shuffle(col1, col0, 3, 3, 3, 3);
+        v4f Temp3 = v4f_shuffle(ca[1], ca[0], 3, 3, 3, 3);
         v4f Vec3 = v4f_swizzle(Temp3, 0, 2, 2, 2);
 
         v4f Mul0 = _mm_mul_ps(Vec1, Fac0);
@@ -1272,13 +1270,13 @@ public:
         v4f Row1 = v4f_shuffle(Inv2, Inv3, 0, 0, 0, 0);
         v4f Row2 = v4f_shuffle(Row0, Row1, 0, 2, 0, 2);
 
-        v4f Det0 = v4f_dot44(col0, Row2);
+        v4f Det0 = v4f_dot44(ca[0], Row2);
         v4f Rcp0 = v4f_rcp(Det0);
 
-        col0 = _mm_mul_ps(Inv0, Rcp0);
-        col1 = _mm_mul_ps(Inv1, Rcp0);
-        col2 = _mm_mul_ps(Inv2, Rcp0);
-        col3 = _mm_mul_ps(Inv3, Rcp0);
+        ca[0] = _mm_mul_ps(Inv0, Rcp0);
+        ca[1] = _mm_mul_ps(Inv1, Rcp0);
+        ca[2] = _mm_mul_ps(Inv2, Rcp0);
+        ca[3] = _mm_mul_ps(Inv3, Rcp0);
     }
 
     ML_INLINE void InvertOrtho();
@@ -1300,40 +1298,40 @@ public:
         float wy2 = q.w * y2;
         float wz2 = q.w * z2;
 
-        col0 = float4(1.0f - (yy2 + zz2), xy2 + wz2, xz2 - wy2, 0.0f).xmm;
-        col1 = float4(xy2 - wz2, 1.0f - (xx2 + zz2), yz2 + wx2, 0.0f).xmm;
-        col2 = float4(xz2 + wy2, yz2 - wx2, 1.0f - (xx2 + yy2), 0.0f).xmm;
-        col3 = c_v4f_0001;
+        ca[0] = float4(1.0f - (yy2 + zz2), xy2 + wz2, xz2 - wy2, 0.0f).xmm;
+        ca[1] = float4(xy2 - wz2, 1.0f - (xx2 + zz2), yz2 + wx2, 0.0f).xmm;
+        ca[2] = float4(xz2 + wy2, yz2 - wx2, 1.0f - (xx2 + yy2), 0.0f).xmm;
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByRotationX(float angleX) {
         float ct = cos(angleX);
         float st = sin(angleX);
 
-        col0 = float4(1.0f, 0.0f, 0.0f, 0.0f);
-        col1 = float4(0.0f, ct, st, 0.0f);
-        col2 = float4(0.0f, -st, ct, 0.0f);
-        col3 = c_v4f_0001;
+        ca[0] = float4(1.0f, 0.0f, 0.0f, 0.0f);
+        ca[1] = float4(0.0f, ct, st, 0.0f);
+        ca[2] = float4(0.0f, -st, ct, 0.0f);
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByRotationY(float angleY) {
         float ct = cos(angleY);
         float st = sin(angleY);
 
-        col0 = float4(ct, 0.0f, -st, 0.0f);
-        col1 = float4(0.0f, 1.0f, 0.0f, 0.0f);
-        col2 = float4(st, 0.0f, ct, 0.0f);
-        col3 = c_v4f_0001;
+        ca[0] = float4(ct, 0.0f, -st, 0.0f);
+        ca[1] = float4(0.0f, 1.0f, 0.0f, 0.0f);
+        ca[2] = float4(st, 0.0f, ct, 0.0f);
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByRotationZ(float angleZ) {
         float ct = cos(angleZ);
         float st = sin(angleZ);
 
-        col0 = float4(ct, st, 0.0f, 0.0f);
-        col1 = float4(-st, ct, 0.0f, 0.0f);
-        col2 = float4(0.0f, 0.0f, 1.0f, 0.0f);
-        col3 = c_v4f_0001;
+        ca[0] = float4(ct, st, 0.0f, 0.0f);
+        ca[1] = float4(-st, ct, 0.0f, 0.0f);
+        ca[2] = float4(0.0f, 0.0f, 1.0f, 0.0f);
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByRotationYPR(float fYaw, float fPitch, float fRoll) {
@@ -1372,7 +1370,7 @@ public:
         a22 = c.y * c.z;
         a32 = 0.0f;
 
-        col3 = c_v4f_0001;
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByRotation(float theta, const float3& v) {
@@ -1412,7 +1410,7 @@ public:
         a31 = 0.0f;
         a32 = 0.0f;
 
-        col3 = c_v4f_0001;
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByRotation(const float3& z, const float3& d) {
@@ -1449,21 +1447,21 @@ public:
         a31 = 0.0f;
         a32 = 0.0f;
 
-        col3 = c_v4f_0001;
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByTranslation(const float3& p) {
-        col0 = float4(1.0f, 0.0f, 0.0f, 0.0f);
-        col1 = float4(0.0f, 1.0f, 0.0f, 0.0f);
-        col2 = float4(0.0f, 0.0f, 1.0f, 0.0f);
-        col3 = v4f_setw1(p);
+        ca[0] = float4(1.0f, 0.0f, 0.0f, 0.0f);
+        ca[1] = float4(0.0f, 1.0f, 0.0f, 0.0f);
+        ca[2] = float4(0.0f, 0.0f, 1.0f, 0.0f);
+        ca[3] = v4f_setw1(p);
     }
 
     ML_INLINE void SetupByScale(const float3& scale) {
-        col0 = float4(scale.x, 0.0f, 0.0f, 0.0f);
-        col1 = float4(0.0f, scale.y, 0.0f, 0.0f);
-        col2 = float4(0.0f, 0.0f, scale.z, 0.0f);
-        col3 = c_v4f_0001;
+        ca[0] = float4(scale.x, 0.0f, 0.0f, 0.0f);
+        ca[1] = float4(0.0f, scale.y, 0.0f, 0.0f);
+        ca[2] = float4(0.0f, 0.0f, scale.z, 0.0f);
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByLookAt(const float3& vForward) {
@@ -1471,10 +1469,10 @@ public:
         float3 z = GetPerpendicularVector(y);
         float3 x = cross(y, z);
 
-        col0 = v4f_setw0(x);
-        col1 = v4f_setw0(y);
-        col2 = v4f_setw0(z);
-        col3 = c_v4f_0001;
+        ca[0] = v4f_setw0(x);
+        ca[1] = v4f_setw0(y);
+        ca[2] = v4f_setw0(z);
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByLookAt(const float3& vForward, const float3& vRight) {
@@ -1482,10 +1480,10 @@ public:
         float3 z = normalize(cross(vRight, y));
         float3 x = cross(y, z);
 
-        col0 = v4f_setw0(x);
-        col1 = v4f_setw0(y);
-        col2 = v4f_setw0(z);
-        col3 = c_v4f_0001;
+        ca[0] = v4f_setw0(x);
+        ca[1] = v4f_setw0(y);
+        ca[2] = v4f_setw0(z);
+        ca[3] = c_v4f_0001;
     }
 
     ML_INLINE void SetupByOrthoProjection(float left, float right, float bottom, float top, float zNear, float zFar, uint32_t uiProjFlags = 0) {
@@ -1522,7 +1520,7 @@ public:
         a23 = ML_ModifyProjZ(bReverseZ, a23, a33);
 
         if (uiProjFlags & PROJ_LEFT_HANDED)
-            col2 = v4f_negate(col2);
+            ca[2] = v4f_negate(ca[2]);
     }
 
     ML_INLINE void SetupByFrustum(float left, float right, float bottom, float top, float zNear, float zFar, uint32_t uiProjFlags = 0) {
@@ -1559,7 +1557,7 @@ public:
         a23 = ML_ModifyProjZ(bReverseZ, a23, a33);
 
         if (uiProjFlags & PROJ_LEFT_HANDED)
-            col2 = v4f_negate(col2);
+            ca[2] = v4f_negate(ca[2]);
     }
 
     ML_INLINE void SetupByFrustumInf(float left, float right, float bottom, float top, float zNear, uint32_t uiProjFlags = 0) {
@@ -1595,7 +1593,7 @@ public:
         a23 = ML_ModifyProjZ(bReverseZ, a23, a33);
 
         if (uiProjFlags & PROJ_LEFT_HANDED)
-            col2 = v4f_negate(col2);
+            ca[2] = v4f_negate(ca[2]);
     }
 
     ML_INLINE void SetupByHalfFovy(float halfFovy, float aspect, float zNear, float zFar, uint32_t uiProjFlags = 0) {
@@ -1673,18 +1671,18 @@ ML_INLINE float4x4 transpose(const float4x4& m) {
 // non-HLSL
 
 ML_INLINE float3 Rotate(const float4x4& m, const float3& v) {
-    v4f r = _mm_mul_ps(v4f_swizzle(v.xmm, 0, 0, 0, 0), m.col0);
-    r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 1, 1, 1, 1), m.col1, r);
-    r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 2, 2, 2, 2), m.col2, r);
+    v4f r = _mm_mul_ps(v4f_swizzle(v.xmm, 0, 0, 0, 0), m.ca[0]);
+    r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 1, 1, 1, 1), m.ca[1], r);
+    r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 2, 2, 2, 2), m.ca[2], r);
     r = v4f_setw0(r);
 
     return r;
 }
 
 ML_INLINE float3 RotateAbs(const float4x4& m, const float3& v) {
-    v4f col0_abs = v4f_abs(m.col0);
-    v4f col1_abs = v4f_abs(m.col1);
-    v4f col2_abs = v4f_abs(m.col2);
+    v4f col0_abs = v4f_abs(m.ca[0]);
+    v4f col1_abs = v4f_abs(m.ca[1]);
+    v4f col2_abs = v4f_abs(m.ca[2]);
 
     v4f r = _mm_mul_ps(v4f_swizzle(v.xmm, 0, 0, 0, 0), col0_abs);
     r = _mm_fmadd_ps(v4f_swizzle(v.xmm, 1, 1, 1, 1), col1_abs, r);
@@ -1702,19 +1700,19 @@ ML_INLINE float3 Project(const float3& v, const float4x4& m) {
 
 ML_INLINE void float4x4::PreTranslation(const float3& p) {
     v4f r = Rotate(*this, p.xmm).xmm;
-    col3 = _mm_add_ps(col3, r);
+    ca[3] = _mm_add_ps(ca[3], r);
 }
 
 ML_INLINE void float4x4::InvertOrtho() {
     Transpose3x4();
 
-    col3 = Rotate(*this, float3(col3)).xmm;
-    col3 = v4f_negate(col3);
+    ca[3] = Rotate(*this, float3(ca[3])).xmm;
+    ca[3] = v4f_negate(ca[3]);
 
-    col0 = v4f_setw0(col0);
-    col1 = v4f_setw0(col1);
-    col2 = v4f_setw0(col2);
-    col3 = v4f_setw1(col3);
+    ca[0] = v4f_setw0(ca[0]);
+    ca[1] = v4f_setw0(ca[1]);
+    ca[2] = v4f_setw0(ca[2]);
+    ca[3] = v4f_setw1(ca[3]);
 }
 
 //======================================================================================================================

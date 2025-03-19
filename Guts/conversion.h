@@ -238,10 +238,10 @@ ML_INLINE double4::operator float4() const {
 // From float4x4
 ML_INLINE float4x4::operator double4x4() const {
     double4x4 r;
-    r.col0 = _mm256_cvtps_pd(col0);
-    r.col1 = _mm256_cvtps_pd(col1);
-    r.col2 = _mm256_cvtps_pd(col2);
-    r.col3 = _mm256_cvtps_pd(col3);
+    r.ca[0] = _mm256_cvtps_pd(ca[0]);
+    r.ca[1] = _mm256_cvtps_pd(ca[1]);
+    r.ca[2] = _mm256_cvtps_pd(ca[2]);
+    r.ca[3] = _mm256_cvtps_pd(ca[3]);
 
     return r;
 }
@@ -249,10 +249,10 @@ ML_INLINE float4x4::operator double4x4() const {
 // From double4x4
 ML_INLINE double4x4::operator float4x4() const {
     float4x4 r;
-    r.col0 = _mm256_cvtpd_ps(col0);
-    r.col1 = _mm256_cvtpd_ps(col1);
-    r.col2 = _mm256_cvtpd_ps(col2);
-    r.col3 = _mm256_cvtpd_ps(col3);
+    r.ca[0] = _mm256_cvtpd_ps(ca[0]);
+    r.ca[1] = _mm256_cvtpd_ps(ca[1]);
+    r.ca[2] = _mm256_cvtpd_ps(ca[2]);
+    r.ca[3] = _mm256_cvtpd_ps(ca[3]);
 
     return r;
 }

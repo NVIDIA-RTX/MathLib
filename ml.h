@@ -483,11 +483,11 @@ union uDouble {
     ML_INLINE C operator op(const C& v) const { \
         return C(x op v.x, y op v.y); \
     } \
-    ML_INLINE C operator op(T c) const { \
-        return C(x op c, y op c); \
-    } \
     ML_INLINE friend C operator op(T c, const C& v) { \
         return C(c op v.x, c op v.y); \
+    } \
+    ML_INLINE friend C operator op(const C& v, T c) { \
+        return C(v.x op c, v.y op c); \
     } \
     ML_INLINE void operator opeq(const C& v) { \
         x opeq v.x; \
@@ -502,11 +502,11 @@ union uDouble {
     ML_INLINE C operator op(const C& v) const { \
         return f(reg, v.reg); \
     } \
-    ML_INLINE C operator op(T c) const { \
-        return f(reg, broadcast(c)); \
-    } \
     ML_INLINE friend C operator op(T c, const C& v) { \
         return f(broadcast(c), v.reg); \
+    } \
+    ML_INLINE friend C operator op(const C& v, T c) { \
+        return f(v.reg, broadcast(c)); \
     } \
     ML_INLINE void operator opeq(const C& v) { \
         reg = f(reg, v.reg); \

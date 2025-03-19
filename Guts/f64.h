@@ -919,11 +919,11 @@ public:
     // Compare
 
     ML_INLINE bool operator==(const double4x4& m) const {
-        return all(double4(ca[0]) == double4(m.ca[0])) && all(double4(ca[1]) == double4(m.ca[1])) && all(double4(ca[2]) == double4(m.ca[2])) && all(double4(ca[3]) == double4(m.ca[3]));
+        return all(ca[0] == m.ca[0]) && all(ca[1] == m.ca[1]) && all(ca[2] == m.ca[2]) && all(ca[3] == m.ca[3]);
     }
 
     ML_INLINE bool operator!=(const double4x4& m) const {
-        return any(double4(ca[0]) != double4(m.ca[0])) || any(double4(ca[1]) != double4(m.ca[1])) || any(double4(ca[2]) != double4(m.ca[2])) || any(double4(ca[3]) != double4(m.ca[3]));
+        return any(ca[0] != m.ca[0]) || any(ca[1] != m.ca[1]) || any(ca[2] != m.ca[2]) || any(ca[3] != m.ca[3]);
     }
 
     // NOTE: *

@@ -915,11 +915,11 @@ public:
     // Compare
 
     ML_INLINE bool operator==(const float4x4& m) const {
-        return all(float4(ca[0]) == float4(m.ca[0])) && all(float4(ca[1]) == float4(m.ca[1])) && all(float4(ca[2]) == float4(m.ca[2])) && all(float4(ca[3]) == float4(m.ca[3]));
+        return all(ca[0] == m.ca[0]) && all(ca[1] == m.ca[1]) && all(ca[2] == m.ca[2]) && all(ca[3] == m.ca[3]);
     }
 
     ML_INLINE bool operator!=(const float4x4& m) const {
-        return any(float4(ca[0]) != float4(m.ca[0])) || any(float4(ca[1]) != float4(m.ca[1])) || any(float4(ca[2]) != float4(m.ca[2])) || any(float4(ca[3]) != float4(m.ca[3]));
+        return any(ca[0] != m.ca[0]) || any(ca[1] != m.ca[1]) || any(ca[2] != m.ca[2]) || any(ca[3] != m.ca[3]);
     }
 
     // NOTE: *

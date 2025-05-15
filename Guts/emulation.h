@@ -72,57 +72,57 @@ ML_INLINE T _mm_copy(const T& x, const T& y) {
 #undef _CMP_TRUE_US
 
 #define _MM_FROUND_TO_NEAREST_INT 0x00
-#define _MM_FROUND_TO_NEG_INF 0x01
-#define _MM_FROUND_TO_POS_INF 0x02
-#define _MM_FROUND_TO_ZERO 0x03
-#define _MM_FROUND_CUR_DIRECTION 0x04
-#define _MM_FROUND_NO_EXC 0x08
+#define _MM_FROUND_TO_NEG_INF     0x01
+#define _MM_FROUND_TO_POS_INF     0x02
+#define _MM_FROUND_TO_ZERO        0x03
+#define _MM_FROUND_CUR_DIRECTION  0x04
+#define _MM_FROUND_NO_EXC         0x08
 
-#define _MM_ROUND_NEAREST 0x0000
-#define _MM_ROUND_DOWN 0x2000
-#define _MM_ROUND_UP 0x4000
+#define _MM_ROUND_NEAREST     0x0000
+#define _MM_ROUND_DOWN        0x2000
+#define _MM_ROUND_UP          0x4000
 #define _MM_ROUND_TOWARD_ZERO 0x6000
 
 #define _MM_FROUND_RAISE_EXC 0x00
-#define _MM_FROUND_NINT _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_RAISE_EXC
-#define _MM_FROUND_FLOOR _MM_FROUND_TO_NEG_INF | _MM_FROUND_RAISE_EXC
-#define _MM_FROUND_CEIL _MM_FROUND_TO_POS_INF | _MM_FROUND_RAISE_EXC
-#define _MM_FROUND_TRUNC _MM_FROUND_TO_ZERO | _MM_FROUND_RAISE_EXC
-#define _MM_FROUND_RINT _MM_FROUND_CUR_DIRECTION | _MM_FROUND_RAISE_EXC
+#define _MM_FROUND_NINT      _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_RAISE_EXC
+#define _MM_FROUND_FLOOR     _MM_FROUND_TO_NEG_INF | _MM_FROUND_RAISE_EXC
+#define _MM_FROUND_CEIL      _MM_FROUND_TO_POS_INF | _MM_FROUND_RAISE_EXC
+#define _MM_FROUND_TRUNC     _MM_FROUND_TO_ZERO | _MM_FROUND_RAISE_EXC
+#define _MM_FROUND_RINT      _MM_FROUND_CUR_DIRECTION | _MM_FROUND_RAISE_EXC
 #define _MM_FROUND_NEARBYINT _MM_FROUND_CUR_DIRECTION | _MM_FROUND_NO_EXC
 
-#define _CMP_EQ_OQ 0x00    /* Equal (ordered, non-signaling)  */
-#define _CMP_LT_OS 0x01    /* Less-than (ordered, signaling)  */
-#define _CMP_LE_OS 0x02    /* Less-than-or-equal (ordered, signaling)  */
-#define _CMP_UNORD_Q 0x03  /* Unordered (non-signaling)  */
-#define _CMP_NEQ_UQ 0x04   /* Not-equal (unordered, non-signaling)  */
-#define _CMP_NLT_US 0x05   /* Not-less-than (unordered, signaling)  */
-#define _CMP_NLE_US 0x06   /* Not-less-than-or-equal (unordered, signaling)  */
-#define _CMP_ORD_Q 0x07    /* Ordered (non-signaling)   */
-#define _CMP_EQ_UQ 0x08    /* Equal (unordered, non-signaling)  */
-#define _CMP_NGE_US 0x09   /* Not-greater-than-or-equal (unordered, signaling)  */
-#define _CMP_NGT_US 0x0a   /* Not-greater-than (unordered, signaling)  */
+#define _CMP_EQ_OQ    0x00 /* Equal (ordered, non-signaling)  */
+#define _CMP_LT_OS    0x01 /* Less-than (ordered, signaling)  */
+#define _CMP_LE_OS    0x02 /* Less-than-or-equal (ordered, signaling)  */
+#define _CMP_UNORD_Q  0x03 /* Unordered (non-signaling)  */
+#define _CMP_NEQ_UQ   0x04 /* Not-equal (unordered, non-signaling)  */
+#define _CMP_NLT_US   0x05 /* Not-less-than (unordered, signaling)  */
+#define _CMP_NLE_US   0x06 /* Not-less-than-or-equal (unordered, signaling)  */
+#define _CMP_ORD_Q    0x07 /* Ordered (non-signaling)   */
+#define _CMP_EQ_UQ    0x08 /* Equal (unordered, non-signaling)  */
+#define _CMP_NGE_US   0x09 /* Not-greater-than-or-equal (unordered, signaling)  */
+#define _CMP_NGT_US   0x0a /* Not-greater-than (unordered, signaling)  */
 #define _CMP_FALSE_OQ 0x0b /* False (ordered, non-signaling)  */
-#define _CMP_NEQ_OQ 0x0c   /* Not-equal (ordered, non-signaling)  */
-#define _CMP_GE_OS 0x0d    /* Greater-than-or-equal (ordered, signaling)  */
-#define _CMP_GT_OS 0x0e    /* Greater-than (ordered, signaling)  */
-#define _CMP_TRUE_UQ 0x0f  /* True (unordered, non-signaling)  */
-#define _CMP_EQ_OS 0x10    /* Equal (ordered, signaling)  */
-#define _CMP_LT_OQ 0x11    /* Less-than (ordered, non-signaling)  */
-#define _CMP_LE_OQ 0x12    /* Less-than-or-equal (ordered, non-signaling)  */
-#define _CMP_UNORD_S 0x13  /* Unordered (signaling)  */
-#define _CMP_NEQ_US 0x14   /* Not-equal (unordered, signaling)  */
-#define _CMP_NLT_UQ 0x15   /* Not-less-than (unordered, non-signaling)  */
-#define _CMP_NLE_UQ 0x16   /* Not-less-than-or-equal (unordered, non-signaling)  */
-#define _CMP_ORD_S 0x17    /* Ordered (signaling)  */
-#define _CMP_EQ_US 0x18    /* Equal (unordered, signaling)  */
-#define _CMP_NGE_UQ 0x19   /* Not-greater-than-or-equal (unordered, non-signaling)  */
-#define _CMP_NGT_UQ 0x1a   /* Not-greater-than (unordered, non-signaling)  */
+#define _CMP_NEQ_OQ   0x0c /* Not-equal (ordered, non-signaling)  */
+#define _CMP_GE_OS    0x0d /* Greater-than-or-equal (ordered, signaling)  */
+#define _CMP_GT_OS    0x0e /* Greater-than (ordered, signaling)  */
+#define _CMP_TRUE_UQ  0x0f /* True (unordered, non-signaling)  */
+#define _CMP_EQ_OS    0x10 /* Equal (ordered, signaling)  */
+#define _CMP_LT_OQ    0x11 /* Less-than (ordered, non-signaling)  */
+#define _CMP_LE_OQ    0x12 /* Less-than-or-equal (ordered, non-signaling)  */
+#define _CMP_UNORD_S  0x13 /* Unordered (signaling)  */
+#define _CMP_NEQ_US   0x14 /* Not-equal (unordered, signaling)  */
+#define _CMP_NLT_UQ   0x15 /* Not-less-than (unordered, non-signaling)  */
+#define _CMP_NLE_UQ   0x16 /* Not-less-than-or-equal (unordered, non-signaling)  */
+#define _CMP_ORD_S    0x17 /* Ordered (signaling)  */
+#define _CMP_EQ_US    0x18 /* Equal (unordered, signaling)  */
+#define _CMP_NGE_UQ   0x19 /* Not-greater-than-or-equal (unordered, non-signaling)  */
+#define _CMP_NGT_UQ   0x1a /* Not-greater-than (unordered, non-signaling)  */
 #define _CMP_FALSE_OS 0x1b /* False (ordered, signaling)  */
-#define _CMP_NEQ_OS 0x1c   /* Not-equal (ordered, signaling)  */
-#define _CMP_GE_OQ 0x1d    /* Greater-than-or-equal (ordered, non-signaling)  */
-#define _CMP_GT_OQ 0x1e    /* Greater-than (ordered, non-signaling)  */
-#define _CMP_TRUE_US 0x1f  /* True (unordered, signaling)  */
+#define _CMP_NEQ_OS   0x1c /* Not-equal (ordered, signaling)  */
+#define _CMP_GE_OQ    0x1d /* Greater-than-or-equal (ordered, non-signaling)  */
+#define _CMP_GT_OQ    0x1e /* Greater-than (ordered, non-signaling)  */
+#define _CMP_TRUE_US  0x1f /* True (unordered, signaling)  */
 
 #if (ML_INTRINSIC_LEVEL < ML_INTRINSIC_SSE4)
 
@@ -489,17 +489,23 @@ __EMU_M256_IMPL_M2(__m256, xor_ps);
 
 #    define emu_mm_shuffle_ps(x, y, imm) \
         emu__m256 { \
-            { _mm_shuffle_ps(x.emu_128[0], y.emu_128[0], imm), _mm_shuffle_ps(x.emu_128[1], y.emu_128[1], imm) } \
+            { \
+                _mm_shuffle_ps(x.emu_128[0], y.emu_128[0], imm), _mm_shuffle_ps(x.emu_128[1], y.emu_128[1], imm) \
+            } \
         }
 
 #    define emu_mm256_shuffle_pd(x, y, imm) \
         emu__m256d { \
-            { _mm_shuffle_pd(x.emu_m128[0], y.emu_m128[0], imm), _mm_shuffle_pd(x.emu_m128[1], y.emu_m128[1], imm) } \
+            { \
+                _mm_shuffle_pd(x.emu_m128[0], y.emu_m128[0], imm), _mm_shuffle_pd(x.emu_m128[1], y.emu_m128[1], imm) \
+            } \
         }
 
 #    define emu_mm256_permute_ps(m256_param1, param2) \
         emu__m256d { \
-            { emu_mm_permute_ps(m256_param1.emu_m128[0], param2), emu_mm_permute_ps(m256_param1.emu_m128[1], param2) } \
+            { \
+                emu_mm_permute_ps(m256_param1.emu_m128[0], param2), emu_mm_permute_ps(m256_param1.emu_m128[1], param2) \
+            } \
         }
 
 #    define emu_mm256_blend_pd(m256_param1, m256_param2, param3) \
@@ -520,17 +526,23 @@ __EMU_M256_IMPL_M2(__m256, xor_ps);
 
 #    define emu_mm256_dp_ps(m256_param1, m256_param2, param3) \
         emu__m256 { \
-            { _mm_dp_ps(m256_param1.emu_m128[0], m256_param2.emu_m128[0], param3), _mm_dp_ps(m256_param1.emu_m128[1], m256_param2.emu_m128[1], param3) } \
+            { \
+                _mm_dp_ps(m256_param1.emu_m128[0], m256_param2.emu_m128[0], param3), _mm_dp_ps(m256_param1.emu_m128[1], m256_param2.emu_m128[1], param3) \
+            } \
         }
 
 #    define emu_mm256_round_pd(m256_param1, param2) \
         emu__m256d { \
-            { _mm_round_pd(m256_param1.emu_m128[0], param2), _mm_round_pd(m256_param1.emu_m128[1], param2) } \
+            { \
+                _mm_round_pd(m256_param1.emu_m128[0], param2), _mm_round_pd(m256_param1.emu_m128[1], param2) \
+            } \
         }
 
 #    define emu_mm256_round_ps(m256_param1, param2) \
         emu__m256 { \
-            { _mm_round_ps(m256_param1.emu_m128[0], param2), _mm_round_ps(m256_param1.emu_m128[1], param2) } \
+            { \
+                _mm_round_ps(m256_param1.emu_m128[0], param2), _mm_round_ps(m256_param1.emu_m128[1], param2) \
+            } \
         }
 
 __EMU_M256_IMPL_M3(__m256d, blendv_pd);
@@ -1327,12 +1339,12 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm_cmp_pd
 #    undef _mm256_cmp_pd
 #    define _mm_cmp_pd(a, b, imm) emu_mm_cmp_pd<imm>(a, b)
-#    define _mm256_cmp_pd emu_mm256_cmp_pd
+#    define _mm256_cmp_pd         emu_mm256_cmp_pd
 
 #    undef _mm_cmp_ps
 #    undef _mm256_cmp_ps
 #    define _mm_cmp_ps(a, b, imm) emu_mm_cmp_ps<imm>(a, b)
-#    define _mm256_cmp_ps emu_mm256_cmp_ps
+#    define _mm256_cmp_ps         emu_mm256_cmp_ps
 
 #    undef _mm256_cvtepi32_pd
 #    undef _mm256_cvtepi32_ps
@@ -1342,54 +1354,54 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_cvtpd_ps
 #    undef _mm256_cvtps_epi32
 #    undef _mm256_cvtps_pd
-#    define _mm256_cvtpd_ps emu_mm256_cvtpd_ps
+#    define _mm256_cvtpd_ps    emu_mm256_cvtpd_ps
 #    define _mm256_cvtps_epi32 emu_mm256_cvtps_epi32
-#    define _mm256_cvtps_pd emu_mm256_cvtps_pd
+#    define _mm256_cvtps_pd    emu_mm256_cvtps_pd
 
 #    undef _mm256_cvttpd_epi32
 #    undef _mm256_cvtpd_epi32
 #    undef _mm256_cvttps_epi32
 #    define _mm256_cvttpd_epi32 emu_mm256_cvttpd_epi32
-#    define _mm256_cvtpd_epi32 emu_mm256_cvtpd_epi32
+#    define _mm256_cvtpd_epi32  emu_mm256_cvtpd_epi32
 #    define _mm256_cvttps_epi32 emu_mm256_cvttps_epi32
 
 #    undef _mm256_extractf128_ps
 #    undef _mm256_extractf128_pd
 #    undef _mm256_extractf128_si256
-#    define _mm256_extractf128_ps emu_mm256_extractf128_ps
-#    define _mm256_extractf128_pd emu_mm256_extractf128_pd
+#    define _mm256_extractf128_ps    emu_mm256_extractf128_ps
+#    define _mm256_extractf128_pd    emu_mm256_extractf128_pd
 #    define _mm256_extractf128_si256 emu_mm256_extractf128_si256
 
 #    undef _mm256_zeroall
 #    undef _mm256_zeroupper
-#    define _mm256_zeroall emu_mm256_zeroall
+#    define _mm256_zeroall   emu_mm256_zeroall
 #    define _mm256_zeroupper emu_mm256_zeroupper
 
 #    undef _mm256_permutevar_ps
 #    undef _mm_permutevar_ps
 #    define _mm256_permutevar_ps emu_mm256_permutevar_ps
-#    define _mm_permutevar_ps emu_mm_permutevar_ps
+#    define _mm_permutevar_ps    emu_mm_permutevar_ps
 
 #    undef _mm256_permute_ps
 #    undef _mm_permute_ps
 #    define _mm256_permute_ps emu_mm256_permute_ps
-#    define _mm_permute_ps emu_mm_permute_ps
+#    define _mm_permute_ps    emu_mm_permute_ps
 
 #    undef _mm256_permutevar_pd
 #    undef _mm_permutevar_pd
 #    define _mm256_permutevar_pd emu_mm256_permutevar_pd
-#    define _mm_permutevar_pd emu_mm_permutevar_pd
+#    define _mm_permutevar_pd    emu_mm_permutevar_pd
 
 #    undef _mm256_permute_pd
 #    undef _mm_permute_pd
 #    define _mm256_permute_pd emu_mm256_permute_pd
-#    define _mm_permute_pd emu_mm_permute_pd
+#    define _mm_permute_pd    emu_mm_permute_pd
 
 #    undef _mm256_permute2f128_ps
 #    undef _mm256_permute2f128_pd
 #    undef _mm256_permute2f128_si256
-#    define _mm256_permute2f128_ps emu_mm256_permute2f128_ps
-#    define _mm256_permute2f128_pd emu_mm256_permute2f128_pd
+#    define _mm256_permute2f128_ps    emu_mm256_permute2f128_ps
+#    define _mm256_permute2f128_pd    emu_mm256_permute2f128_pd
 #    define _mm256_permute2f128_si256 emu_mm256_permute2f128_si256
 
 #    undef _mm256_broadcast_ss
@@ -1409,54 +1421,54 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_insertf128_ps
 #    undef _mm256_insertf128_pd
 #    undef _mm256_insertf128_si256
-#    define _mm256_insertf128_ps emu_mm256_insertf128_ps
-#    define _mm256_insertf128_pd emu_mm256_insertf128_pd
+#    define _mm256_insertf128_ps    emu_mm256_insertf128_ps
+#    define _mm256_insertf128_pd    emu_mm256_insertf128_pd
 #    define _mm256_insertf128_si256 emu_mm256_insertf128_si256
 
 #    undef _mm256_load_pd
 #    undef _mm256_store_pd
 #    undef _mm256_load_ps
 #    undef _mm256_store_ps
-#    define _mm256_load_pd emu_mm256_load_pd
+#    define _mm256_load_pd  emu_mm256_load_pd
 #    define _mm256_store_pd emu_mm256_store_pd
-#    define _mm256_load_ps emu_mm256_load_ps
+#    define _mm256_load_ps  emu_mm256_load_ps
 #    define _mm256_store_ps emu_mm256_store_ps
 
 #    undef _mm256_loadu_pd
 #    undef _mm256_storeu_pd
 #    undef _mm256_loadu_ps
 #    undef _mm256_storeu_ps
-#    define _mm256_loadu_pd emu_mm256_loadu_pd
+#    define _mm256_loadu_pd  emu_mm256_loadu_pd
 #    define _mm256_storeu_pd emu_mm256_storeu_pd
-#    define _mm256_loadu_ps emu_mm256_loadu_ps
+#    define _mm256_loadu_ps  emu_mm256_loadu_ps
 #    define _mm256_storeu_ps emu_mm256_storeu_ps
 
 #    undef _mm256_load_si256
 #    undef _mm256_store_si256
 #    undef _mm256_loadu_si256
 #    undef _mm256_storeu_si256
-#    define _mm256_load_si256 emu_mm256_load_si256
-#    define _mm256_store_si256 emu_mm256_store_si256
-#    define _mm256_loadu_si256 emu_mm256_loadu_si256
+#    define _mm256_load_si256   emu_mm256_load_si256
+#    define _mm256_store_si256  emu_mm256_store_si256
+#    define _mm256_loadu_si256  emu_mm256_loadu_si256
 #    define _mm256_storeu_si256 emu_mm256_storeu_si256
 
 #    undef _mm256_maskload_pd
 #    undef _mm256_maskstore_pd
 #    undef _mm_maskload_pd
 #    undef _mm_maskstore_pd
-#    define _mm256_maskload_pd emu_mm256_maskload_pd
+#    define _mm256_maskload_pd  emu_mm256_maskload_pd
 #    define _mm256_maskstore_pd emu_mm256_maskstore_pd
-#    define _mm_maskload_pd emu_mm_maskload_pd
-#    define _mm_maskstore_pd emu_mm_maskstore_pd
+#    define _mm_maskload_pd     emu_mm_maskload_pd
+#    define _mm_maskstore_pd    emu_mm_maskstore_pd
 
 #    undef _mm256_maskload_ps
 #    undef _mm256_maskstore_ps
 #    undef _mm_maskload_ps
 #    undef _mm_maskstore_ps
-#    define _mm256_maskload_ps emu_mm256_maskload_ps
+#    define _mm256_maskload_ps  emu_mm256_maskload_ps
 #    define _mm256_maskstore_ps emu_mm256_maskstore_ps
-#    define _mm_maskload_ps emu_mm_maskload_ps
-#    define _mm_maskstore_ps emu_mm_maskstore_ps
+#    define _mm_maskload_ps     emu_mm_maskload_ps
+#    define _mm_maskstore_ps    emu_mm_maskstore_ps
 
 #    undef _mm256_movehdup_ps
 #    undef _mm256_moveldup_ps
@@ -1465,19 +1477,19 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 
 #    undef _mm256_movedup_pd
 #    undef _mm256_lddqu_si256
-#    define _mm256_movedup_pd emu_mm256_movedup_pd
+#    define _mm256_movedup_pd  emu_mm256_movedup_pd
 #    define _mm256_lddqu_si256 emu_mm256_lddqu_si256
 
 #    undef _mm256_stream_si256
 #    undef _mm256_stream_pd
 #    undef _mm256_stream_ps
 #    define _mm256_stream_si256 emu_mm256_stream_si256
-#    define _mm256_stream_pd emu_mm256_stream_pd
-#    define _mm256_stream_ps emu_mm256_stream_ps
+#    define _mm256_stream_pd    emu_mm256_stream_pd
+#    define _mm256_stream_ps    emu_mm256_stream_ps
 
 #    undef _mm256_rcp_ps
 #    undef _mm256_rsqrt_ps
-#    define _mm256_rcp_ps emu_mm256_rcp_ps
+#    define _mm256_rcp_ps   emu_mm256_rcp_ps
 #    define _mm256_rsqrt_ps emu_mm256_rsqrt_ps
 
 #    undef _mm256_sqrt_pd
@@ -1504,8 +1516,8 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_testz_si256
 #    undef _mm256_testc_si256
 #    undef _mm256_testnzc_si256
-#    define _mm256_testz_si256 emu_mm256_testz_si256
-#    define _mm256_testc_si256 emu_mm256_testc_si256
+#    define _mm256_testz_si256   emu_mm256_testz_si256
+#    define _mm256_testc_si256   emu_mm256_testc_si256
 #    define _mm256_testnzc_si256 emu_mm256_testnzc_si256
 
 #    undef _mm256_testz_pd
@@ -1514,12 +1526,12 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm_testz_pd
 #    undef _mm_testc_pd
 #    undef _mm_testnzc_pd
-#    define _mm256_testz_pd emu_mm256_testz_pd
-#    define _mm256_testc_pd emu_mm256_testc_pd
+#    define _mm256_testz_pd   emu_mm256_testz_pd
+#    define _mm256_testc_pd   emu_mm256_testc_pd
 #    define _mm256_testnzc_pd emu_mm256_testnzc_pd
-#    define _mm_testz_pd emu_mm_testz_pd
-#    define _mm_testc_pd emu_mm_testc_pd
-#    define _mm_testnzc_pd emu_mm_testnzc_pd
+#    define _mm_testz_pd      emu_mm_testz_pd
+#    define _mm_testc_pd      emu_mm_testc_pd
+#    define _mm_testnzc_pd    emu_mm_testnzc_pd
 
 #    undef _mm256_testz_ps
 #    undef _mm256_testc_ps
@@ -1527,12 +1539,12 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm_testz_ps
 #    undef _mm_testc_ps
 #    undef _mm_testnzc_ps
-#    define _mm256_testz_ps emu_mm256_testz_ps
-#    define _mm256_testc_ps emu_mm256_testc_ps
+#    define _mm256_testz_ps   emu_mm256_testz_ps
+#    define _mm256_testc_ps   emu_mm256_testc_ps
 #    define _mm256_testnzc_ps emu_mm256_testnzc_ps
-#    define _mm_testz_ps emu_mm_testz_ps
-#    define _mm_testc_ps emu_mm_testc_ps
-#    define _mm_testnzc_ps emu_mm_testnzc_ps
+#    define _mm_testz_ps      emu_mm_testz_ps
+#    define _mm_testc_ps      emu_mm_testc_ps
+#    define _mm_testnzc_ps    emu_mm_testnzc_ps
 
 #    undef _mm256_movemask_pd
 #    undef _mm256_movemask_ps
@@ -1542,8 +1554,8 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_setzero_pd
 #    undef _mm256_setzero_ps
 #    undef _mm256_setzero_si256
-#    define _mm256_setzero_pd emu_mm256_setzero_pd
-#    define _mm256_setzero_ps emu_mm256_setzero_ps
+#    define _mm256_setzero_pd    emu_mm256_setzero_pd
+#    define _mm256_setzero_ps    emu_mm256_setzero_ps
 #    define _mm256_setzero_si256 emu_mm256_setzero_si256
 
 #    undef _mm256_set_pd
@@ -1552,11 +1564,11 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_set_epi16
 #    undef _mm256_set_epi32
 #    undef _mm256_set_epi64x
-#    define _mm256_set_pd emu_mm256_set_pd
-#    define _mm256_set_ps emu_mm256_set_ps
-#    define _mm256_set_epi8 emu_mm256_set_epi8
-#    define _mm256_set_epi16 emu_mm256_set_epi16
-#    define _mm256_set_epi32 emu_mm256_set_epi32
+#    define _mm256_set_pd     emu_mm256_set_pd
+#    define _mm256_set_ps     emu_mm256_set_ps
+#    define _mm256_set_epi8   emu_mm256_set_epi8
+#    define _mm256_set_epi16  emu_mm256_set_epi16
+#    define _mm256_set_epi32  emu_mm256_set_epi32
 #    define _mm256_set_epi64x emu_mm256_set_epi64x
 
 #    undef _mm256_setr_pd
@@ -1565,11 +1577,11 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_setr_epi16
 #    undef _mm256_setr_epi32
 #    undef _mm256_setr_epi64x
-#    define _mm256_setr_pd emu_mm256_setr_pd
-#    define _mm256_setr_ps emu_mm256_setr_ps
-#    define _mm256_setr_epi8 emu_mm256_setr_epi8
-#    define _mm256_setr_epi16 emu_mm256_setr_epi16
-#    define _mm256_setr_epi32 emu_mm256_setr_epi32
+#    define _mm256_setr_pd     emu_mm256_setr_pd
+#    define _mm256_setr_ps     emu_mm256_setr_ps
+#    define _mm256_setr_epi8   emu_mm256_setr_epi8
+#    define _mm256_setr_epi16  emu_mm256_setr_epi16
+#    define _mm256_setr_epi32  emu_mm256_setr_epi32
 #    define _mm256_setr_epi64x emu_mm256_setr_epi64x
 
 #    undef _mm256_set1_pd
@@ -1578,11 +1590,11 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_set1_epi16
 #    undef _mm256_set1_epi32
 #    undef _mm256_set1_epi64x
-#    define _mm256_set1_pd emu_mm256_set1_pd
-#    define _mm256_set1_ps emu_mm256_set1_ps
-#    define _mm256_set1_epi8 emu_mm256_set1_epi8
-#    define _mm256_set1_epi16 emu_mm256_set1_epi16
-#    define _mm256_set1_epi32 emu_mm256_set1_epi32
+#    define _mm256_set1_pd     emu_mm256_set1_pd
+#    define _mm256_set1_ps     emu_mm256_set1_ps
+#    define _mm256_set1_epi8   emu_mm256_set1_epi8
+#    define _mm256_set1_epi16  emu_mm256_set1_epi16
+#    define _mm256_set1_epi32  emu_mm256_set1_epi32
 #    define _mm256_set1_epi64x emu_mm256_set1_epi64x
 
 #    undef _mm256_castpd_ps
@@ -1597,12 +1609,12 @@ ML_INLINE double emu_mm256_cvtsd_f64(const emu__m256d& a) {
 #    undef _mm256_castps128_ps256
 #    undef _mm256_castpd128_pd256
 #    undef _mm256_castsi128_si256
-#    define _mm256_castpd_ps emu_mm256_castpd_ps
-#    define _mm256_castps_pd emu_mm256_castps_pd
-#    define _mm256_castps_si256 emu_mm256_castps_si256
-#    define _mm256_castpd_si256 emu_mm256_castpd_si256
-#    define _mm256_castsi256_ps emu_mm256_castsi256_ps
-#    define _mm256_castsi256_pd emu_mm256_castsi256_pd
+#    define _mm256_castpd_ps       emu_mm256_castpd_ps
+#    define _mm256_castps_pd       emu_mm256_castps_pd
+#    define _mm256_castps_si256    emu_mm256_castps_si256
+#    define _mm256_castpd_si256    emu_mm256_castpd_si256
+#    define _mm256_castsi256_ps    emu_mm256_castsi256_ps
+#    define _mm256_castsi256_pd    emu_mm256_castsi256_pd
 #    define _mm256_castps256_ps128 emu_mm256_castps256_ps128
 #    define _mm256_castpd256_pd128 emu_mm256_castpd256_pd128
 #    define _mm256_castsi256_si128 emu_mm256_castsi256_si128
@@ -1680,20 +1692,20 @@ ML_INLINE __m128i emu_mm_srlv_epi32(const __m128i& x, const __m128i& y) {
 #    undef _mm256_cvtepi32_epi64
 #    undef _mm256_permute4x64_pd
 #    define _mm256_cvtepi32_epi64(a) _mm256_castpd_si256(_mm256_cmp_pd(_mm256_cvtepi32_pd(_mm_and_si128(a, _mm_set1_epi32(1))), _mm256_set1_pd(1.0), _CMP_EQ_OQ))
-#    define _mm256_permute4x64_pd emu_mm256_permute4x64_pd
+#    define _mm256_permute4x64_pd    emu_mm256_permute4x64_pd
 
 #    undef _mm_fmadd_ps
 #    undef _mm_fmsub_ps
 #    undef _mm_fnmadd_ps
-#    define _mm_fmadd_ps(a, b, c) _mm_add_ps(_mm_mul_ps(a, b), c)
-#    define _mm_fmsub_ps(a, b, c) _mm_sub_ps(_mm_mul_ps(a, b), c)
+#    define _mm_fmadd_ps(a, b, c)  _mm_add_ps(_mm_mul_ps(a, b), c)
+#    define _mm_fmsub_ps(a, b, c)  _mm_sub_ps(_mm_mul_ps(a, b), c)
 #    define _mm_fnmadd_ps(a, b, c) _mm_sub_ps(c, _mm_mul_ps(a, b))
 
 #    undef _mm256_fmadd_pd
 #    undef _mm256_fmsub_pd
 #    undef _mm256_fnmadd_pd
-#    define _mm256_fmadd_pd(a, b, c) _mm256_add_pd(_mm256_mul_pd(a, b), c)
-#    define _mm256_fmsub_pd(a, b, c) _mm256_sub_pd(_mm256_mul_pd(a, b), c)
+#    define _mm256_fmadd_pd(a, b, c)  _mm256_add_pd(_mm256_mul_pd(a, b), c)
+#    define _mm256_fmsub_pd(a, b, c)  _mm256_sub_pd(_mm256_mul_pd(a, b), c)
 #    define _mm256_fnmadd_pd(a, b, c) _mm256_sub_pd(c, _mm256_mul_pd(a, b))
 
 #endif

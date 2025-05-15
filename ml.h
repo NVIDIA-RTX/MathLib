@@ -10,8 +10,8 @@ IMPORTANT:
 #pragma once
 
 #define ML_VERSION_MAJOR 1
-#define ML_VERSION_MINOR 3
-#define ML_VERSION_DATE "19 March 2025"
+#define ML_VERSION_MINOR 4
+#define ML_VERSION_DATE  "15 May 2025"
 
 //======================================================================================================================
 // Constants
@@ -148,9 +148,9 @@ IMPORTANT:
 
 // Misc
 
-#define ML_Unused(...) ((void)(__VA_ARGS__))
+#define ML_Unused(...)       ((void)(__VA_ARGS__))
 #define ML_Stringify_(token) #token
-#define ML_Stringify(token) ML_Stringify_(token)
+#define ML_Stringify(token)  ML_Stringify_(token)
 
 #if ML_EXEPTIONS
 #    define ML_ROUNDING_EXEPTIONS_MASK _MM_FROUND_RAISE_EXC
@@ -165,10 +165,10 @@ IMPORTANT:
 #ifdef _DEBUG
 #    include <assert.h> // assert
 
-#    define ML_Assert(x) assert(x)
+#    define ML_Assert(x)         assert(x)
 #    define ML_AssertMsg(x, msg) assert(msg&& x)
 #else
-#    define ML_Assert(x) ((void)0)
+#    define ML_Assert(x)         ((void)0)
 #    define ML_AssertMsg(x, msg) ((void)0)
 #endif
 
@@ -176,8 +176,8 @@ IMPORTANT:
 
 #if ML_OGL // Depth range [-1; 1], origin "lower left"
 #    define ML_NDC_NEAR_NO_REVERSE -1.0f
-#    define ML_DEPTH_C0 (0.5f * (ML_DEPTH_RANGE_FAR - ML_DEPTH_RANGE_NEAR))
-#    define ML_DEPTH_C1 (0.5f * (ML_DEPTH_RANGE_FAR + ML_DEPTH_RANGE_NEAR))
+#    define ML_DEPTH_C0            (0.5f * (ML_DEPTH_RANGE_FAR - ML_DEPTH_RANGE_NEAR))
+#    define ML_DEPTH_C1            (0.5f * (ML_DEPTH_RANGE_FAR + ML_DEPTH_RANGE_NEAR))
 
 template <class T>
 ML_INLINE T ML_ModifyProjZ(bool isReversed, T c2, T c3) {
@@ -186,8 +186,8 @@ ML_INLINE T ML_ModifyProjZ(bool isReversed, T c2, T c3) {
 
 #else // Depth range [0; 1], origin "upper left"
 #    define ML_NDC_NEAR_NO_REVERSE 0.0f
-#    define ML_DEPTH_C0 (ML_DEPTH_RANGE_FAR - ML_DEPTH_RANGE_NEAR)
-#    define ML_DEPTH_C1 ML_DEPTH_RANGE_NEAR
+#    define ML_DEPTH_C0            (ML_DEPTH_RANGE_FAR - ML_DEPTH_RANGE_NEAR)
+#    define ML_DEPTH_C1            ML_DEPTH_RANGE_NEAR
 
 template <class T>
 ML_INLINE T ML_ModifyProjZ(bool isReversed, T c2, T c3) {
@@ -199,12 +199,12 @@ ML_INLINE T ML_ModifyProjZ(bool isReversed, T c2, T c3) {
 #define ML_NDC_FAR_NO_REVERSE 1.0f
 
 #if ML_DEPTH_REVERSED
-#    define ML_NDC_NEAR ML_NDC_FAR_NO_REVERSE
-#    define ML_NDC_FAR ML_NDC_NEAR_NO_REVERSE
+#    define ML_NDC_NEAR  ML_NDC_FAR_NO_REVERSE
+#    define ML_NDC_FAR   ML_NDC_NEAR_NO_REVERSE
 #    define ML_DEPTH_EPS -1e-7f
 #else
-#    define ML_NDC_NEAR ML_NDC_NEAR_NO_REVERSE
-#    define ML_NDC_FAR ML_NDC_FAR_NO_REVERSE
+#    define ML_NDC_NEAR  ML_NDC_NEAR_NO_REVERSE
+#    define ML_NDC_FAR   ML_NDC_FAR_NO_REVERSE
 #    define ML_DEPTH_EPS 1e-7f
 #endif
 
@@ -542,10 +542,10 @@ union uDouble {
 #undef ML_SWIZZLE_3
 #undef ML_SWIZZLE_4
 
-#undef _X
-#undef _Y
-#undef _Z
-#undef _W
+#undef ML_X
+#undef ML_Y
+#undef ML_Z
+#undef ML_W
 
 //======================================================================================================================
 // Misc

@@ -1876,12 +1876,12 @@ public:
         v4f vmax = _mm_max_ps(t1, t2);
 
         // NOTE: hmax.xxx
-        v4f tmin = _mm_max_ps(vmin, v4f_swizzle(vmin, _Y, _Z, _X, 0));
-        tmin = _mm_max_ps(tmin, v4f_swizzle(vmin, _Z, _X, _Y, 0));
+        v4f tmin = _mm_max_ps(vmin, v4f_swizzle(vmin, ML_Y, ML_Z, ML_X, 0));
+        tmin = _mm_max_ps(tmin, v4f_swizzle(vmin, ML_Z, ML_X, ML_Y, 0));
 
         // NOTE: hmin.xxx
-        v4f tmax = _mm_min_ps(vmax, v4f_swizzle(vmax, _Y, _Z, _X, 0));
-        tmax = _mm_min_ps(tmax, v4f_swizzle(vmax, _Z, _X, _Y, 0));
+        v4f tmax = _mm_min_ps(vmax, v4f_swizzle(vmax, ML_Y, ML_Z, ML_X, 0));
+        tmax = _mm_min_ps(tmax, v4f_swizzle(vmax, ML_Z, ML_X, ML_Y, 0));
 
         v4f_store_x(out_fTmin, tmin);
         v4f_store_x(out_fTmax, tmax);

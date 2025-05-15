@@ -1881,12 +1881,12 @@ public:
         v4d vmax = _mm256_max_pd(t1, t2);
 
         // NOTE: hmax.xxx
-        v4d tmin = _mm256_max_pd(vmin, v4d_swizzle(vmin, _Y, _Z, _X, 0));
-        tmin = _mm256_max_pd(tmin, v4d_swizzle(vmin, _Z, _X, _Y, 0));
+        v4d tmin = _mm256_max_pd(vmin, v4d_swizzle(vmin, 1, 2, 0, 0));
+        tmin = _mm256_max_pd(tmin, v4d_swizzle(vmin, 2, 0, 1, 0));
 
         // NOTE: hmin.xxx
-        v4d tmax = _mm256_min_pd(vmax, v4d_swizzle(vmax, _Y, _Z, _X, 0));
-        tmax = _mm256_min_pd(tmax, v4d_swizzle(vmax, _Z, _X, _Y, 0));
+        v4d tmax = _mm256_min_pd(vmax, v4d_swizzle(vmax, 1, 2, 0, 0));
+        tmax = _mm256_min_pd(tmax, v4d_swizzle(vmax, 2, 0, 1, 0));
 
         v4d_store_x(out_fTmin, tmin);
         v4d_store_x(out_fTmax, tmax);

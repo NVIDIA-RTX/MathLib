@@ -9,15 +9,14 @@ IMPORTANT:
 
 #pragma once
 
-#define ML_VERSION_MAJOR 1
-#define ML_VERSION_MINOR 4
-#define ML_VERSION_DATE  "15 May 2025"
+#define ML_VERSION      5
+#define ML_VERSION_DATE "19 May 2025"
 
 //======================================================================================================================
 // Constants
 //======================================================================================================================
 
-// Intrinsic level
+// Intrinsic levels (everything above "ML_INTRINSIC_LEVEL" is emulated)
 #define ML_INTRINSIC_SSE3 0 // +SSSE3
 #define ML_INTRINSIC_SSE4 1 // 4.2 and below
 #define ML_INTRINSIC_AVX1 2 // +FP16C
@@ -32,22 +31,19 @@ IMPORTANT:
 // #define ML_NAMESPACE
 #endif
 
-// Allowed HW intrinsics (emulated if not supported)
-#ifndef ML_INTRINSIC_LEVEL // see above
-#    if defined(__AVX2__)
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX2
-#    elif defined(__AVX__)
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX1
-#    elif defined(__SSE4_2__) || defined(__SSE4_1__)
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE4
-#    else
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE3
-#    endif
+// Selected intrinsic level
+#ifndef ML_INTRINSIC_LEVEL
+#    define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE3
+#endif
+
+// ARM?
+#if (defined(__arm__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM))
+#    define ML_ARM
 #endif
 
 // SVML availability
 #ifndef ML_SVML_AVAILABLE
-#    if defined(__arm__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM)
+#    ifdef ML_ARM
 #        define ML_SVML_AVAILABLE 0
 #    else
 #        define ML_SVML_AVAILABLE (_MSC_VER >= 1920 && __clang__ == 0)
@@ -104,11 +100,36 @@ IMPORTANT:
 // Compiler and environment
 
 #if defined(__GNUC__)
+#    ifndef ML_ARM
+#        pragma GCC push_options
+#        if (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX2)
+#            pragma GCC target("sse3", "ssse3", "sse4", "sse4.1", "sse4.2", "avx", "f16c", "avx2", "fma")
+#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX1)
+#            pragma GCC target("sse3", "ssse3", "sse4", "sse4.1", "sse4.2", "avx", "f16c")
+#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE4)
+#            pragma GCC target("sse3", "ssse3", "sse4", "sse4.1", "sse4.2")
+#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE3)
+#            pragma GCC target("sse3", "ssse3")
+#        endif
+#    endif
+
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 #    define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
 #elif defined(__clang__)
+#    ifndef ML_ARM
+#        if (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX2)
+#            pragma clang attribute push(__attribute__((target("sse3,ssse3,sse4,sse4.1,sse4.2,avx,f16c,avx2,fma"))), apply_to = function)
+#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX1)
+#            pragma clang attribute push(__attribute__((target("sse3,ssse3,sse4,sse4.1,sse4.2,avx,f16c"))), apply_to = function)
+#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE4)
+#            pragma clang attribute push(__attribute__((target("sse3,ssse3,sse4,sse4.1,sse4.2"))), apply_to = function)
+#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE3)
+#            pragma clang attribute push(__attribute__((target("sse3,ssse3"))), apply_to = function)
+#        endif
+#    endif
+
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wstrict-aliasing"
 
@@ -133,7 +154,7 @@ IMPORTANT:
 
 #if (defined(__i386__) || defined(__x86_64__) || defined(__SCE__))
 #    include <x86intrin.h>
-#elif (defined(__arm__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM))
+#elif (defined(ML_ARM))
 #    include "sse2neon.h"
 #else
 #    include <mmintrin.h>
@@ -1155,8 +1176,14 @@ ML_INLINE void DecomposeProjection(eStyle originStyle, eStyle depthStyle, const 
 //======================================================================================================================
 
 #if defined(__GNUC__)
+#    ifndef ML_ARM
+#        pragma GCC pop_options
+#    endif
 #    pragma GCC diagnostic pop
 #elif defined(__clang__)
+#    ifndef ML_ARM
+#        pragma clang attribute pop
+#    endif
 #    pragma clang diagnostic pop
 #else
 #    pragma warning(pop)

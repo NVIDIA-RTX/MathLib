@@ -17,10 +17,10 @@ IMPORTANT:
 //======================================================================================================================
 
 // Intrinsic levels (everything above "ML_INTRINSIC_LEVEL" is emulated)
-#define ML_INTRINSIC_SSE3 0 // +SSSE3, "-mssse3" in GCC/Clang
-#define ML_INTRINSIC_SSE4 1 // 4.2 and below, "-msse4.2" in GCC/Clang
-#define ML_INTRINSIC_AVX1 2 // +FP16C, "-mf16c" in GCC/Clang
-#define ML_INTRINSIC_AVX2 3 // +FMA3, +bit shift, +swizzle "-mavx2 -mfma" in GCC/Clang
+#define ML_INTRINSIC_SSE3 0 // +SSE1, +SSE2, +SSE3, +SSSE3 ("-mssse3" in GCC/Clang)
+#define ML_INTRINSIC_SSE4 1 // +SSE4.1, +SSE4.2 ("-msse4.2" in GCC/Clang)
+#define ML_INTRINSIC_AVX1 2 // +FP16C ("-mf16c" in GCC/Clang)
+#define ML_INTRINSIC_AVX2 3 // +FMA3, +bit shift, +swizzle ("-mavx2 -mfma" in GCC/Clang)
 
 //======================================================================================================================
 // Settings
@@ -31,9 +31,17 @@ IMPORTANT:
 // #define ML_NAMESPACE
 #endif
 
-// Selected intrinsic level
+// Selected intrinsic level (try to guess)
 #ifndef ML_INTRINSIC_LEVEL
-#    define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE3
+#    if (defined(__AVX2__) && defined(__FMA__))
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX2
+#    elif defined(__F16C__)
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX1
+#    elif defined(__SSE4_2__)
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE4
+#    else
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE3
+#    endif
 #endif
 
 // ARM?

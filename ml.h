@@ -100,36 +100,11 @@ IMPORTANT:
 // Compiler and environment
 
 #if defined(__GNUC__)
-#    ifndef ML_ARM
-#        pragma GCC push_options
-#        if (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX2)
-#            pragma GCC target("sse", "sse2", "sse3", "ssse3", "sse4", "sse4.1", "sse4.2", "avx", "f16c", "avx2", "fma")
-#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX1)
-#            pragma GCC target("sse", "sse2", "sse3", "ssse3", "sse4", "sse4.1", "sse4.2", "avx", "f16c")
-#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE4)
-#            pragma GCC target("sse", "sse2", "sse3", "ssse3", "sse4", "sse4.1", "sse4.2")
-#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE3)
-#            pragma GCC target("sse", "sse2", "sse3", "ssse3")
-#        endif
-#    endif
-
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 #    define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
 #elif defined(__clang__)
-#    ifndef ML_ARM
-#        if (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX2)
-#            pragma clang attribute push(__attribute__((target("sse,sse2,sse3,ssse3,sse4,sse4.1,sse4.2,avx,f16c,avx2,fma"))), apply_to = function)
-#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_AVX1)
-#            pragma clang attribute push(__attribute__((target("sse,sse2,sse3,ssse3,sse4,sse4.1,sse4.2,avx,f16c"))), apply_to = function)
-#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE4)
-#            pragma clang attribute push(__attribute__((target("sse,sse2,sse3,ssse3,sse4,sse4.1,sse4.2"))), apply_to = function)
-#        elif (ML_INTRINSIC_LEVEL == ML_INTRINSIC_SSE3)
-#            pragma clang attribute push(__attribute__((target("sse,sse2,sse3,ssse3"))), apply_to = function)
-#        endif
-#    endif
-
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wstrict-aliasing"
 
@@ -1176,14 +1151,8 @@ ML_INLINE void DecomposeProjection(eStyle originStyle, eStyle depthStyle, const 
 //======================================================================================================================
 
 #if defined(__GNUC__)
-#    ifndef ML_ARM
-#        pragma GCC pop_options
-#    endif
 #    pragma GCC diagnostic pop
 #elif defined(__clang__)
-#    ifndef ML_ARM
-#        pragma clang attribute pop
-#    endif
 #    pragma clang diagnostic pop
 #else
 #    pragma warning(pop)

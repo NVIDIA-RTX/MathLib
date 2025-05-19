@@ -17,10 +17,10 @@ IMPORTANT:
 //======================================================================================================================
 
 // Intrinsic levels (everything above "ML_INTRINSIC_LEVEL" is emulated)
-#define ML_INTRINSIC_SSE3 0 // +SSSE3
-#define ML_INTRINSIC_SSE4 1 // 4.2 and below
-#define ML_INTRINSIC_AVX1 2 // +FP16C
-#define ML_INTRINSIC_AVX2 3 // +FMA3, +bit shift, +swizzle
+#define ML_INTRINSIC_SSE3 0 // +SSSE3, "-mssse3" in GCC/Clang
+#define ML_INTRINSIC_SSE4 1 // 4.2 and below, "-msse4.2" in GCC/Clang
+#define ML_INTRINSIC_AVX1 2 // +FP16C, "-mf16c" in GCC/Clang
+#define ML_INTRINSIC_AVX2 3 // +FMA3, +bit shift, +swizzle "-mavx2 -mfma" in GCC/Clang
 
 //======================================================================================================================
 // Settings

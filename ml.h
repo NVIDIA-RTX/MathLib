@@ -9,8 +9,8 @@ IMPORTANT:
 
 #pragma once
 
-#define ML_VERSION      5
-#define ML_VERSION_DATE "19 May 2025"
+#define ML_VERSION      6
+#define ML_VERSION_DATE "1 August 2025"
 
 //======================================================================================================================
 // Constants

@@ -9,8 +9,8 @@ IMPORTANT:
 
 #pragma once
 
-#define ML_VERSION      6
-#define ML_VERSION_DATE "1 August 2025"
+#define ML_VERSION      7
+#define ML_VERSION_DATE "16 September 2025"
 
 //======================================================================================================================
 // Constants
@@ -151,8 +151,10 @@ IMPORTANT:
 #endif
 
 // Misc
-
-#define ML_Unused(...)       ((void)(__VA_ARGS__))
+#define ML_Unused(...) \
+    do { \
+        (void)sizeof(__VA_ARGS__); \
+    } while (0)
 #define ML_Stringify_(token) #token
 #define ML_Stringify(token)  ML_Stringify_(token)
 

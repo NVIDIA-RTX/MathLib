@@ -616,7 +616,7 @@ namespace Geometry
     {
         float3 p;
         p.xy = uv * cameraFrustum.zw + cameraFrustum.xy;
-        p.xy *= viewZ * ( 1.0f - abs( orthoMode ) ) + orthoMode;
+        p.xy *= orthoMode == 0.0f ? viewZ : orthoMode;
         p.z = viewZ;
 
         return p;

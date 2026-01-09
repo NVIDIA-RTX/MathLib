@@ -342,12 +342,6 @@ ML_INLINE bool v4f_is_w_zero(const v4f& x) {
 #    define v4f_is_w_zero(x) (true)
 #endif
 
-#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1)
-ML_INLINE v4i v4f_to_h4(const v4f& x) {
-    return _mm_cvtps_ph(x, _MM_FROUND_TO_NEAREST_INT);
-}
-#endif
-
 ML_INLINE v4f v4f_sign(const v4f& x) {
     // NOTE: 1 for +0, -1 for -0
 
@@ -1172,7 +1166,7 @@ ML_INLINE v4d _v4d_is_inf_or_zero(const v4d& x) {
 #    define _v4d_vselect(mask, x, y) _mm256_blendv_pd(y, x, mask)
 
 ML_INLINE v4i _v4d_selecti(const v4d& d0, const v4d& d1, const v4i& x, const v4i& y) {
-    __m128i mask = _mm256_cvtpd_epi32(_mm256_and_pd(_mm256_cmplt_pd(d0, d1), _mm256_broadcast_sd(c_d + 0)));
+    v4i mask = _mm256_cvtpd_epi32(_mm256_and_pd(_mm256_cmplt_pd(d0, d1), _mm256_broadcast_sd(c_d + 0)));
     mask = _mm_cmpeq_epi32(mask, _mm_set1_epi32(1));
 
     return _v4f_iselect(_mm_castsi128_ps(mask), x, y);

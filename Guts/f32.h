@@ -45,6 +45,7 @@ public:
     ML_INLINE operator int2() const;
     ML_INLINE operator uint2() const;
     ML_INLINE operator double2() const;
+    ML_INLINE operator float16_t2() const;
 
     // Compare
 
@@ -616,6 +617,9 @@ public:
     ML_INLINE operator int4() const;
     ML_INLINE operator uint4() const;
     ML_INLINE operator double4() const;
+    ML_INLINE operator float16_t4() const;
+    ML_INLINE operator float8_e4m3_t4() const;
+    ML_INLINE operator float8_e5m2_t4() const;
 
     // Compare
 

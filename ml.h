@@ -9,8 +9,8 @@ IMPORTANT:
 
 #pragma once
 
-#define ML_VERSION      9
-#define ML_VERSION_DATE "2 October 2025"
+#define ML_VERSION      10
+#define ML_VERSION_DATE "9 January 2026"
 
 //======================================================================================================================
 // Constants
@@ -31,7 +31,7 @@ IMPORTANT:
 // #define ML_NAMESPACE
 #endif
 
-// Selected intrinsic level (try to guess)
+// Select intrinsic level (try to guess)
 #ifndef ML_INTRINSIC_LEVEL
 #    if (defined(__AVX2__) && defined(__FMA__))
 #        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX2
@@ -71,6 +71,11 @@ IMPORTANT:
 // Only for debugging (generate exeptions in rounding operations, only for SSE4)
 #ifndef ML_EXEPTIONS
 #    define ML_EXEPTIONS 0
+#endif
+
+// Only for debugging (no need to disable this)
+#ifndef ML_ALLOW_HW_FP16
+#    define ML_ALLOW_HW_FP16 1
 #endif
 
 // Reversed depth
@@ -532,7 +537,8 @@ union uDouble {
 #include "Guts/u32.h"
 
 // Float
-#include "Guts/f16.h"
+#include "Guts/fsmall.h"
+
 #include "Guts/f32.h"
 #include "Guts/f64.h"
 

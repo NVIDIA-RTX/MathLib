@@ -120,8 +120,8 @@ ML_INLINE float16_t2 float2_to_float16_t2(const float2& v) {
 
     *((int32_t*)&r) = _mm_cvtsi128_si32(p);
 #else
-    r.x = float16_t(v.x);
-    r.y = float16_t(v.y);
+    r.x = float16_t(v.x).x;
+    r.y = float16_t(v.y).x;
 #endif
 
     return r;

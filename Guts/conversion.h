@@ -303,7 +303,7 @@ ML_INLINE float16_t::operator float() const {
 }
 
 ML_INLINE float16_t2::operator float2() const {
-    return float2(float16_t(x.x), float16_t(y.x));
+    return float2(float(x), float(y));
 }
 
 ML_INLINE float16_t4::operator float4() const {
@@ -326,8 +326,8 @@ ML_INLINE float16_t8::float16_t8(const float4& a, const float4& b) {
 
     A_B = v8i_to_u64x2(r);
 #else
-    A = a;
-    B = b;
+    A = float16_t4(a).xyzw;
+    B = float16_t4(b).xyzw;
 #endif
 }
 
@@ -341,7 +341,7 @@ ML_INLINE float8_e4m3_t::operator float() const {
 }
 
 ML_INLINE float8_e4m3_t2::operator float2() const {
-    return float2(float(x.x), float(y.x));
+    return float2(float(x), float(y));
 }
 
 ML_INLINE float8_e4m3_t4::operator float4() const {
@@ -357,8 +357,8 @@ ML_INLINE float8_e4m3_t8::float8_e4m3_t8(const float4& a, const float4& b) {
 
     A_B = v8i_to_u64(r);
 #else
-    A = a;
-    B = b;
+    A = float8_e4m3_t4(a).xyzw;
+    B = float8_e4m3_t4(b).xyzw;
 #endif
 }
 
@@ -372,7 +372,7 @@ ML_INLINE float8_e5m2_t::operator float() const {
 }
 
 ML_INLINE float8_e5m2_t2::operator float2() const {
-    return float2(float(x.x), float(y.x));
+    return float2(float(x), float(y));
 }
 
 ML_INLINE float8_e5m2_t4::operator float4() const {
@@ -388,7 +388,7 @@ ML_INLINE float8_e5m2_t8::float8_e5m2_t8(const float4& a, const float4& b) {
 
     A_B = v8i_to_u64(r);
 #else
-    A = a;
-    B = b;
+    A = float8_e5m2_t4(a).xyzw;
+    B = float8_e5m2_t4(b).xyzw;
 #endif
 }

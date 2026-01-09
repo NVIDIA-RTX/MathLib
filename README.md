@@ -6,16 +6,19 @@
 
 Features:
 - compile-time optimization level specialization: SSE3 (and below), +SSE4, +AVX1, +AVX2 (or NEON on ARM via [*sse2neon*](https://github.com/DLTcollab/sse2neon))
-- `int2`, `int3` and `int4` types
-- `uint2`, `uint3` and `uint4` types
-- `float2`, `float3`, `float4` and `float4x4` types
-- `double2`, `double3`, `double4` and `double4x4` types
-- `bool2`, `bool3` and `bool4` types
+- `int[2,3,4]` types
+- `uint[2,3,4]` types
+- `float[2,3,4]` and `float4x4` types
+- `double[2,3,4]` and `double4x4` types
+- `bool[2,3,4]` types
+- "small float" types for DL/ML
+  - `float8_e4m3_t[2,4,8]`, `float8_e5m2_t[2,4,8]` and `float16_t[2,4,8]`
 - overloaded operators
 - vector swizzling
 - common functions: `all`, `any`, `sign`, `abs`, `floor`, `round`, `ceil`, `fmod`, `frac`, `min`, `max`, `clamp`, `saturate`, `lerp`, `step`, `smoothstep` and `linearstep`
 - transcendental functions: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sqrt`, `rsqrt`, `rcp`, `pow`, `log`, `log2`, `exp` and `exp2`
-- data conversion and packing functionality - FP32, FP16, SNORM and UNORM (with any number of bits per component)
+- optimized data conversions and packing functionality
+  - from `fp32` to `fp16`, `fp11`, `fp10`, `fp8_e4m3`, `fp8_e5m2`, `SNORM` and `UNORM` (and back)
 - vectors and matrices
 - linear algebra miscellaneous functionality
 - projective math miscellaneous functionality

@@ -120,8 +120,7 @@ ML_INLINE float16_t2 float2_to_float16_t2(const float2& v) {
 
     *((int32_t*)&r) = _mm_cvtsi128_si32(p);
 #else
-    r.x = float16_t(v.x).x;
-    r.y = float16_t(v.y).x;
+    r = v;
 #endif
 
     return r;
@@ -255,8 +254,7 @@ ML_INLINE float2 float16_t2_to_float2(const float16_t2& p) {
 
     _mm_storel_pi((__m64*)&r.mm, f);
 #else
-    r.x = float(p.x);
-    r.y = float(p.y);
+    r = p;
 #endif
 
     return r;
@@ -268,10 +266,7 @@ ML_INLINE float4 float16_t4_to_float4(const float16_t4& p) {
     v4i t = _mm_loadu_si64(&p);
     f.xmm = _mm_cvtph_ps(t);
 #else
-    f.x = float(p.x);
-    f.y = float(p.y);
-    f.z = float(p.z);
-    f.w = float(p.w);
+    f = p;
 #endif
 
     return f;

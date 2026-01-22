@@ -294,16 +294,12 @@ ML_INLINE double4x4::operator float4x4() const {
 }
 
 // float16
-ML_INLINE float16_t::float16_t(float v) {
-    x = (uint16_t)f32tof16(v);
-}
-
-ML_INLINE float16_t::operator float() const {
-    return f16tof32(x);
-}
-
 ML_INLINE float16_t2::operator float2() const {
+#ifdef ML_NATIVE_FLOAT16_T
     return float2(float(x), float(y));
+#else
+    return float2(*(float16_t*)&x, *(float16_t*)&y);
+#endif
 }
 
 ML_INLINE float16_t4::operator float4() const {

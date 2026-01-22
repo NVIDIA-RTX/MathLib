@@ -10,7 +10,7 @@ IMPORTANT:
 #pragma once
 
 #define ML_VERSION      10
-#define ML_VERSION_DATE "9 January 2026"
+#define ML_VERSION_DATE "22 January 2026"
 
 //======================================================================================================================
 // Constants
@@ -45,8 +45,12 @@ IMPORTANT:
 #endif
 
 // ARM?
-#if (defined(__arm__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM))
+#if (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || defined(_M_ARM64))
 #    define ML_ARM
+#endif
+
+#if (defined(__ARM_NEON) || defined(__ARM_FP16) || defined(__aarch64__))
+#    define ML_NATIVE_FLOAT16_T
 #endif
 
 // SVML availability

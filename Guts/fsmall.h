@@ -2,6 +2,10 @@
 
 #pragma once
 
+// IMPORTANT: all components and predefined swizzles must be used only for "storage" operation:
+//    float f32 = f16;   // OK, conversion operator gets involved
+//    float f32 = f16.x; // Wrong! "uint16_t" gets converted to "float" (a warning should be injected)
+
 // IEEE 754-2008 Half Precision
 // https://ieeexplore.ieee.org/document/4610935
 // https://en.wikipedia.org/wiki/Half-precision_floating-point_format
@@ -51,314 +55,6 @@ struct fp8_e4m3 {
     static constexpr uint32_t mBits = 3;
     static constexpr bool sign = true;
     static constexpr bool inf = false;
-};
-
-//======================================================================================================================
-// float16
-//======================================================================================================================
-
-#ifndef __ARM_NEON
-struct float16_t {
-    uint16_t x;
-
-    ML_INLINE float16_t() = default;
-    ML_INLINE float16_t(const float16_t&) = default;
-    ML_INLINE float16_t& operator=(const float16_t&) = default;
-
-    // Conversion
-
-    ML_INLINE float16_t(float v);
-    ML_INLINE operator float() const;
-};
-#endif
-
-union float16_t2 {
-    uint32_t xy;
-
-    struct {
-        uint16_t x, y;
-    };
-
-    ML_INLINE float16_t2(const float16_t& x, const float16_t& y)
-        : x(x.x), y(y.x) {
-    }
-
-    ML_INLINE float16_t2() = default;
-    ML_INLINE float16_t2(const float16_t2&) = default;
-    ML_INLINE float16_t2& operator=(const float16_t2&) = default;
-
-    // Conversion
-
-    ML_INLINE operator float2() const;
-};
-
-union float16_t4 {
-    uint64_t xyzw;
-
-    struct {
-        uint32_t xy, zw;
-    };
-
-    struct {
-        uint16_t x, y, z, w;
-    };
-
-    ML_INLINE float16_t4(const float16_t& x, const float16_t& y, const float16_t& z, const float16_t& w)
-        : x(x.x), y(y.x), z(z.x), w(w.x) {
-    }
-
-    ML_INLINE float16_t4(const float16_t2& xy, const float16_t2& zw)
-        : xy(xy.xy), zw(zw.xy) {
-    }
-
-    ML_INLINE float16_t4() = default;
-    ML_INLINE float16_t4(const float16_t4&) = default;
-    ML_INLINE float16_t4& operator=(const float16_t4&) = default;
-
-    // Conversion
-
-    ML_INLINE operator float4() const;
-};
-
-union float16_t8 {
-    v4i A_B;
-
-    struct {
-        uint64_t A, B;
-    };
-
-    struct {
-        uint32_t Axy, Azw, Bxy, Bzw;
-    };
-
-    struct {
-        uint16_t Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
-    };
-
-    ML_INLINE float16_t8(const float16_t& Ax, const float16_t& Ay, const float16_t& Az, const float16_t& Aw,
-        const float16_t& Bx, const float16_t& By, const float16_t& Bz, const float16_t& Bw)
-        : Ax(Ax.x), Ay(Ay.x), Az(Az.x), Aw(Aw.x), Bx(Bx.x), By(By.x), Bz(Bz.x), Bw(Bw.x) {
-    }
-
-    ML_INLINE float16_t8(const float16_t2& Axy, const float16_t2& Azw, const float16_t2& Bxy, const float16_t2& Bzw)
-        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
-    }
-
-    ML_INLINE float16_t8(const float16_t4& a, const float16_t4& b)
-        : A(a.xyzw), B(b.xyzw) {
-    }
-
-    ML_INLINE float16_t8() = default;
-    ML_INLINE float16_t8(const float16_t8&) = default;
-    ML_INLINE float16_t8& operator=(const float16_t8&) = default;
-
-    // Conversion
-
-    ML_INLINE float16_t8(const float4& a, const float4& b);
-};
-
-//======================================================================================================================
-// float8_e4m3
-//======================================================================================================================
-
-struct float8_e4m3_t {
-    uint8_t x;
-
-    ML_INLINE float8_e4m3_t() = default;
-    ML_INLINE float8_e4m3_t(const float8_e4m3_t&) = default;
-    ML_INLINE float8_e4m3_t& operator=(const float8_e4m3_t&) = default;
-
-    // Conversion
-
-    ML_INLINE float8_e4m3_t(float v);
-    ML_INLINE operator float() const;
-};
-
-union float8_e4m3_t2 {
-    uint16_t xy;
-
-    struct {
-        uint8_t x, y;
-    };
-
-    ML_INLINE float8_e4m3_t2(const float8_e4m3_t& x, const float8_e4m3_t& y)
-        : x(x.x), y(y.x) {
-    }
-
-    ML_INLINE float8_e4m3_t2() = default;
-    ML_INLINE float8_e4m3_t2(const float8_e4m3_t2&) = default;
-    ML_INLINE float8_e4m3_t2& operator=(const float8_e4m3_t2&) = default;
-
-    // Conversion
-
-    ML_INLINE operator float2() const;
-};
-
-union float8_e4m3_t4 {
-    uint32_t xyzw;
-
-    struct {
-        uint16_t xy, zw;
-    };
-
-    struct {
-        uint8_t x, y, z, w;
-    };
-
-    ML_INLINE float8_e4m3_t4(const float8_e4m3_t& x, const float8_e4m3_t& y, const float8_e4m3_t& z, const float8_e4m3_t& w)
-        : x(x.x), y(y.x), z(z.x), w(w.x) {
-    }
-
-    ML_INLINE float8_e4m3_t4(const float8_e4m3_t2& xy, const float8_e4m3_t2& zw)
-        : xy(xy.xy), zw(zw.xy) {
-    }
-
-    ML_INLINE float8_e4m3_t4() = default;
-    ML_INLINE float8_e4m3_t4(const float8_e4m3_t4&) = default;
-    ML_INLINE float8_e4m3_t4& operator=(const float8_e4m3_t4&) = default;
-
-    // Conversion
-
-    ML_INLINE operator float4() const;
-};
-
-union float8_e4m3_t8 {
-    uint64_t A_B;
-
-    struct {
-        uint32_t A, B;
-    };
-
-    struct {
-        uint16_t Axy, Azw, Bxy, Bzw;
-    };
-
-    struct {
-        uint8_t Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
-    };
-
-    ML_INLINE float8_e4m3_t8(const float8_e4m3_t& Ax, const float8_e4m3_t& Ay, const float8_e4m3_t& Az, const float8_e4m3_t& Aw,
-        const float8_e4m3_t& Bx, const float8_e4m3_t& By, const float8_e4m3_t& Bz, const float8_e4m3_t& Bw)
-        : Ax(Ax.x), Ay(Ay.x), Az(Az.x), Aw(Aw.x), Bx(Bx.x), By(By.x), Bz(Bz.x), Bw(Bw.x) {
-    }
-
-    ML_INLINE float8_e4m3_t8(const float8_e4m3_t2& Axy, const float8_e4m3_t2& Azw, const float8_e4m3_t2& Bxy, const float8_e4m3_t2& Bzw)
-        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
-    }
-
-    ML_INLINE float8_e4m3_t8(const float8_e4m3_t4& a, const float8_e4m3_t4& b)
-        : A(a.xyzw), B(b.xyzw) {
-    }
-
-    ML_INLINE float8_e4m3_t8() = default;
-    ML_INLINE float8_e4m3_t8(const float8_e4m3_t8&) = default;
-    ML_INLINE float8_e4m3_t8& operator=(const float8_e4m3_t8&) = default;
-
-    // Conversion
-
-    ML_INLINE float8_e4m3_t8(const float4& a, const float4& b);
-};
-
-//======================================================================================================================
-// float8_e5m2
-//======================================================================================================================
-
-struct float8_e5m2_t {
-    uint8_t x;
-
-    ML_INLINE float8_e5m2_t() = default;
-    ML_INLINE float8_e5m2_t(const float8_e5m2_t&) = default;
-    ML_INLINE float8_e5m2_t& operator=(const float8_e5m2_t&) = default;
-
-    // Conversion
-
-    ML_INLINE float8_e5m2_t(float v);
-    ML_INLINE operator float() const;
-};
-
-union float8_e5m2_t2 {
-    uint16_t xy;
-
-    struct {
-        uint8_t x, y;
-    };
-
-    ML_INLINE float8_e5m2_t2(const float8_e5m2_t& x, const float8_e5m2_t& y)
-        : x(x.x), y(y.x) {
-    }
-
-    ML_INLINE float8_e5m2_t2() = default;
-    ML_INLINE float8_e5m2_t2(const float8_e5m2_t2&) = default;
-    ML_INLINE float8_e5m2_t2& operator=(const float8_e5m2_t2&) = default;
-
-    // Conversion
-
-    ML_INLINE operator float2() const;
-};
-
-union float8_e5m2_t4 {
-    uint32_t xyzw;
-
-    struct {
-        uint16_t xy, zw;
-    };
-
-    struct {
-        uint8_t x, y, z, w;
-    };
-
-    ML_INLINE float8_e5m2_t4(const float8_e5m2_t& x, const float8_e5m2_t& y, const float8_e5m2_t& z, const float8_e5m2_t& w)
-        : x(x.x), y(y.x), z(z.x), w(w.x) {
-    }
-
-    ML_INLINE float8_e5m2_t4(const float8_e5m2_t2& xy, const float8_e5m2_t2& zw)
-        : xy(xy.xy), zw(zw.xy) {
-    }
-
-    ML_INLINE float8_e5m2_t4() = default;
-    ML_INLINE float8_e5m2_t4(const float8_e5m2_t4&) = default;
-    ML_INLINE float8_e5m2_t4& operator=(const float8_e5m2_t4&) = default;
-
-    // Conversion
-
-    ML_INLINE operator float4() const;
-};
-
-union float8_e5m2_t8 {
-    uint64_t A_B;
-
-    struct {
-        uint32_t A, B;
-    };
-
-    struct {
-        uint16_t Axy, Azw, Bxy, Bzw;
-    };
-
-    struct {
-        uint8_t Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
-    };
-
-    ML_INLINE float8_e5m2_t8(const float8_e5m2_t& Ax, const float8_e5m2_t& Ay, const float8_e5m2_t& Az, const float8_e5m2_t& Aw,
-        const float8_e5m2_t& Bx, const float8_e5m2_t& By, const float8_e5m2_t& Bz, const float8_e5m2_t& Bw)
-        : Ax(Ax.x), Ay(Ay.x), Az(Az.x), Aw(Aw.x), Bx(Bx.x), By(By.x), Bz(Bz.x), Bw(Bw.x) {
-    }
-
-    ML_INLINE float8_e5m2_t8(const float8_e5m2_t2& Axy, const float8_e5m2_t2& Azw, const float8_e5m2_t2& Bxy, const float8_e5m2_t2& Bzw)
-        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
-    }
-
-    ML_INLINE float8_e5m2_t8(const float8_e5m2_t4& a, const float8_e5m2_t4& b)
-        : A(a.xyzw), B(b.xyzw) {
-    }
-
-    ML_INLINE float8_e5m2_t8() = default;
-    ML_INLINE float8_e5m2_t8(const float8_e5m2_t8&) = default;
-    ML_INLINE float8_e5m2_t8& operator=(const float8_e5m2_t8&) = default;
-
-    // Conversion
-
-    ML_INLINE float8_e5m2_t8(const float4& a, const float4& b);
 };
 
 //======================================================================================================================
@@ -825,3 +521,332 @@ ML_INLINE float f16tof32(uint32_t x) {
     return FromSmallFloat<fp16>(x);
 #endif
 }
+
+//======================================================================================================================
+// float16
+//======================================================================================================================
+
+#ifdef ML_NATIVE_FLOAT16_T
+typedef float16_t fp16_storage;
+#else
+struct float16_t {
+    uint16_t x; // TODO: this is only for internal needs, avoid using ".x" in your code, since native "float16_t" on ARM doesn't have it
+
+    ML_INLINE float16_t() = default;
+    ML_INLINE float16_t(const float16_t&) = default;
+    ML_INLINE float16_t& operator=(const float16_t&) = default;
+
+    // Conversion
+
+    ML_INLINE float16_t(float v) {
+        x = (uint16_t)f32tof16(v);
+    }
+
+    ML_INLINE operator float() const {
+        return f16tof32(x);
+    }
+};
+
+typedef uint16_t fp16_storage;
+#endif
+
+union float16_t2 {
+    uint32_t xy;
+
+    struct {
+        fp16_storage x, y;
+    };
+
+    ML_INLINE float16_t2(const float16_t& _x, const float16_t& _y)
+#ifdef ML_NATIVE_FLOAT16_T
+        : x(_x), y(_y) {
+#else
+        : x(_x.x), y(_y.x) {
+#endif
+    }
+
+    ML_INLINE float16_t2() = default;
+    ML_INLINE float16_t2(const float16_t2&) = default;
+    ML_INLINE float16_t2& operator=(const float16_t2&) = default;
+
+    // Conversion
+
+    ML_INLINE operator float2() const;
+};
+
+union float16_t4 {
+    uint64_t xyzw;
+
+    struct {
+        uint32_t xy, zw;
+    };
+
+    struct {
+        fp16_storage x, y, z, w;
+    };
+
+    ML_INLINE float16_t4(const float16_t& _x, const float16_t& _y, const float16_t& _z, const float16_t& _w)
+#ifdef ML_NATIVE_FLOAT16_T
+        : x(_x), y(_y), z(_z), w(_w) {
+#else
+        : x(_x.x), y(_y.x), z(_z.x), w(_w.x) {
+#endif
+    }
+
+    ML_INLINE float16_t4(const float16_t2& xy, const float16_t2& zw)
+        : xy(xy.xy), zw(zw.xy) {
+    }
+
+    ML_INLINE float16_t4() = default;
+    ML_INLINE float16_t4(const float16_t4&) = default;
+    ML_INLINE float16_t4& operator=(const float16_t4&) = default;
+
+    // Conversion
+
+    ML_INLINE operator float4() const;
+};
+
+union float16_t8 {
+    v4i A_B;
+
+    struct {
+        uint64_t A, B;
+    };
+
+    struct {
+        uint32_t Axy, Azw, Bxy, Bzw;
+    };
+
+    struct {
+        fp16_storage Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
+    };
+
+    ML_INLINE float16_t8(const float16_t& _Ax, const float16_t& _Ay, const float16_t& _Az, const float16_t& _Aw,
+        const float16_t& _Bx, const float16_t& _By, const float16_t& _Bz, const float16_t& _Bw)
+#ifdef ML_NATIVE_FLOAT16_T
+        : Ax(_Ax), Ay(_Ay), Az(_Az), Aw(_Aw), Bx(_Bx), By(_By), Bz(_Bz), Bw(_Bw) {
+#else
+        : Ax(_Ax.x), Ay(_Ay.x), Az(_Az.x), Aw(_Aw.x), Bx(_Bx.x), By(_By.x), Bz(_Bz.x), Bw(_Bw.x) {
+#endif
+    }
+
+    ML_INLINE float16_t8(const float16_t2& Axy, const float16_t2& Azw, const float16_t2& Bxy, const float16_t2& Bzw)
+        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
+    }
+
+    ML_INLINE float16_t8(const float16_t4& a, const float16_t4& b)
+        : A(a.xyzw), B(b.xyzw) {
+    }
+
+    ML_INLINE float16_t8() = default;
+    ML_INLINE float16_t8(const float16_t8&) = default;
+    ML_INLINE float16_t8& operator=(const float16_t8&) = default;
+
+    // Conversion
+
+    ML_INLINE float16_t8(const float4& a, const float4& b);
+};
+
+//======================================================================================================================
+// float8_e4m3
+//======================================================================================================================
+
+struct float8_e4m3_t {
+    uint8_t x;
+
+    ML_INLINE float8_e4m3_t() = default;
+    ML_INLINE float8_e4m3_t(const float8_e4m3_t&) = default;
+    ML_INLINE float8_e4m3_t& operator=(const float8_e4m3_t&) = default;
+
+    // Conversion
+
+    ML_INLINE float8_e4m3_t(float v);
+    ML_INLINE operator float() const;
+};
+
+union float8_e4m3_t2 {
+    uint16_t xy;
+
+    struct {
+        uint8_t x, y;
+    };
+
+    ML_INLINE float8_e4m3_t2(const float8_e4m3_t& x, const float8_e4m3_t& y)
+        : x(x.x), y(y.x) {
+    }
+
+    ML_INLINE float8_e4m3_t2() = default;
+    ML_INLINE float8_e4m3_t2(const float8_e4m3_t2&) = default;
+    ML_INLINE float8_e4m3_t2& operator=(const float8_e4m3_t2&) = default;
+
+    // Conversion
+
+    ML_INLINE operator float2() const;
+};
+
+union float8_e4m3_t4 {
+    uint32_t xyzw;
+
+    struct {
+        uint16_t xy, zw;
+    };
+
+    struct {
+        uint8_t x, y, z, w;
+    };
+
+    ML_INLINE float8_e4m3_t4(const float8_e4m3_t& x, const float8_e4m3_t& y, const float8_e4m3_t& z, const float8_e4m3_t& w)
+        : x(x.x), y(y.x), z(z.x), w(w.x) {
+    }
+
+    ML_INLINE float8_e4m3_t4(const float8_e4m3_t2& xy, const float8_e4m3_t2& zw)
+        : xy(xy.xy), zw(zw.xy) {
+    }
+
+    ML_INLINE float8_e4m3_t4() = default;
+    ML_INLINE float8_e4m3_t4(const float8_e4m3_t4&) = default;
+    ML_INLINE float8_e4m3_t4& operator=(const float8_e4m3_t4&) = default;
+
+    // Conversion
+
+    ML_INLINE operator float4() const;
+};
+
+union float8_e4m3_t8 {
+    uint64_t A_B;
+
+    struct {
+        uint32_t A, B;
+    };
+
+    struct {
+        uint16_t Axy, Azw, Bxy, Bzw;
+    };
+
+    struct {
+        uint8_t Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
+    };
+
+    ML_INLINE float8_e4m3_t8(const float8_e4m3_t& Ax, const float8_e4m3_t& Ay, const float8_e4m3_t& Az, const float8_e4m3_t& Aw,
+        const float8_e4m3_t& Bx, const float8_e4m3_t& By, const float8_e4m3_t& Bz, const float8_e4m3_t& Bw)
+        : Ax(Ax.x), Ay(Ay.x), Az(Az.x), Aw(Aw.x), Bx(Bx.x), By(By.x), Bz(Bz.x), Bw(Bw.x) {
+    }
+
+    ML_INLINE float8_e4m3_t8(const float8_e4m3_t2& Axy, const float8_e4m3_t2& Azw, const float8_e4m3_t2& Bxy, const float8_e4m3_t2& Bzw)
+        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
+    }
+
+    ML_INLINE float8_e4m3_t8(const float8_e4m3_t4& a, const float8_e4m3_t4& b)
+        : A(a.xyzw), B(b.xyzw) {
+    }
+
+    ML_INLINE float8_e4m3_t8() = default;
+    ML_INLINE float8_e4m3_t8(const float8_e4m3_t8&) = default;
+    ML_INLINE float8_e4m3_t8& operator=(const float8_e4m3_t8&) = default;
+
+    // Conversion
+
+    ML_INLINE float8_e4m3_t8(const float4& a, const float4& b);
+};
+
+//======================================================================================================================
+// float8_e5m2
+//======================================================================================================================
+
+struct float8_e5m2_t {
+    uint8_t x;
+
+    ML_INLINE float8_e5m2_t() = default;
+    ML_INLINE float8_e5m2_t(const float8_e5m2_t&) = default;
+    ML_INLINE float8_e5m2_t& operator=(const float8_e5m2_t&) = default;
+
+    // Conversion
+
+    ML_INLINE float8_e5m2_t(float v);
+    ML_INLINE operator float() const;
+};
+
+union float8_e5m2_t2 {
+    uint16_t xy;
+
+    struct {
+        uint8_t x, y;
+    };
+
+    ML_INLINE float8_e5m2_t2(const float8_e5m2_t& x, const float8_e5m2_t& y)
+        : x(x.x), y(y.x) {
+    }
+
+    ML_INLINE float8_e5m2_t2() = default;
+    ML_INLINE float8_e5m2_t2(const float8_e5m2_t2&) = default;
+    ML_INLINE float8_e5m2_t2& operator=(const float8_e5m2_t2&) = default;
+
+    // Conversion
+
+    ML_INLINE operator float2() const;
+};
+
+union float8_e5m2_t4 {
+    uint32_t xyzw;
+
+    struct {
+        uint16_t xy, zw;
+    };
+
+    struct {
+        uint8_t x, y, z, w;
+    };
+
+    ML_INLINE float8_e5m2_t4(const float8_e5m2_t& x, const float8_e5m2_t& y, const float8_e5m2_t& z, const float8_e5m2_t& w)
+        : x(x.x), y(y.x), z(z.x), w(w.x) {
+    }
+
+    ML_INLINE float8_e5m2_t4(const float8_e5m2_t2& xy, const float8_e5m2_t2& zw)
+        : xy(xy.xy), zw(zw.xy) {
+    }
+
+    ML_INLINE float8_e5m2_t4() = default;
+    ML_INLINE float8_e5m2_t4(const float8_e5m2_t4&) = default;
+    ML_INLINE float8_e5m2_t4& operator=(const float8_e5m2_t4&) = default;
+
+    // Conversion
+
+    ML_INLINE operator float4() const;
+};
+
+union float8_e5m2_t8 {
+    uint64_t A_B;
+
+    struct {
+        uint32_t A, B;
+    };
+
+    struct {
+        uint16_t Axy, Azw, Bxy, Bzw;
+    };
+
+    struct {
+        uint8_t Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
+    };
+
+    ML_INLINE float8_e5m2_t8(const float8_e5m2_t& Ax, const float8_e5m2_t& Ay, const float8_e5m2_t& Az, const float8_e5m2_t& Aw,
+        const float8_e5m2_t& Bx, const float8_e5m2_t& By, const float8_e5m2_t& Bz, const float8_e5m2_t& Bw)
+        : Ax(Ax.x), Ay(Ay.x), Az(Az.x), Aw(Aw.x), Bx(Bx.x), By(By.x), Bz(Bz.x), Bw(Bw.x) {
+    }
+
+    ML_INLINE float8_e5m2_t8(const float8_e5m2_t2& Axy, const float8_e5m2_t2& Azw, const float8_e5m2_t2& Bxy, const float8_e5m2_t2& Bzw)
+        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
+    }
+
+    ML_INLINE float8_e5m2_t8(const float8_e5m2_t4& a, const float8_e5m2_t4& b)
+        : A(a.xyzw), B(b.xyzw) {
+    }
+
+    ML_INLINE float8_e5m2_t8() = default;
+    ML_INLINE float8_e5m2_t8(const float8_e5m2_t8&) = default;
+    ML_INLINE float8_e5m2_t8& operator=(const float8_e5m2_t8&) = default;
+
+    // Conversion
+
+    ML_INLINE float8_e5m2_t8(const float4& a, const float4& b);
+};

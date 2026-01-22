@@ -119,7 +119,17 @@ ML_INLINE float2::operator double2() const {
 }
 
 ML_INLINE float2::operator float16_t2() const {
+#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1 && ML_ALLOW_HW_FP16)
+    v4f t = v4f_set(x, y, 0.0f, 0.0f);
+    v4i p = _mm_cvtps_ph(t, _MM_FROUND_TO_NEAREST_INT);
+
+    float16_t2 r;
+    r.xy = (uint32_t)_mm_cvtsi128_si32(p);
+
+    return r;
+#else
     return float16_t2(x, y);
+#endif
 }
 
 // double2
@@ -297,6 +307,14 @@ ML_INLINE double4x4::operator float4x4() const {
 ML_INLINE float16_t2::operator float2() const {
 #ifdef ML_NATIVE_FLOAT16_T
     return float2(float(x), float(y));
+#elif (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1 && ML_ALLOW_HW_FP16)
+    v4i t = _mm_cvtsi32_si128((int32_t)xy);
+    v4f f = _mm_cvtph_ps(t);
+
+    float2 r;
+    _mm_storel_pi((__m64*)&r.mm, f);
+
+    return r;
 #else
     return float2(*(float16_t*)&x, *(float16_t*)&y);
 #endif

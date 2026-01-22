@@ -112,35 +112,6 @@ ML_INLINE uint32_t float2_to_snorm_16_16(const float2& v) {
     return p;
 }
 
-ML_INLINE float16_t2 float2_to_float16_t2(const float2& v) {
-    float16_t2 r;
-#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1)
-    v4f t = v4f_set(v.x, v.y, 0.0f, 0.0f);
-    v4i p = _mm_cvtps_ph(t, _MM_FROUND_TO_NEAREST_INT);
-
-    *((int32_t*)&r) = _mm_cvtsi128_si32(p);
-#else
-    r = v;
-#endif
-
-    return r;
-}
-
-ML_INLINE float16_t4 float4_to_float16_t4(const float4& v) {
-    float16_t4 r;
-#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1)
-    v4i p = _mm_cvtps_ph(v.xmm, _MM_FROUND_TO_NEAREST_INT);
-    *((int64_t*)&r) = _mm_extract_epi64(p, 0);
-#else
-    float16_t2 xy = float2_to_float16_t2(v.xy);
-    float16_t2 zw = float2_to_float16_t2(v.zw);
-
-    r = float16_t4(xy, zw);
-#endif
-
-    return r;
-}
-
 template <uint32_t Rbits, uint32_t Gbits, uint32_t Bbits, uint32_t Abits>
 ML_INLINE float4 unorm_to_float4(uint32_t p) {
     ML_StaticAssertMsg(Rbits + Gbits + Bbits + Abits <= 32, "Sum of all bit must be <= 32");
@@ -244,32 +215,6 @@ ML_INLINE float4 snorm_to_float4<8, 8, 8, 8>(uint32_t p) {
     t = _mm_max_ps(t, _mm_set1_ps(-1.0f));
 
     return t;
-}
-
-ML_INLINE float2 float16_t2_to_float2(const float16_t2& p) {
-    float2 r;
-#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1)
-    v4i t = _mm_cvtsi32_si128(*(int32_t*)&p);
-    v4f f = _mm_cvtph_ps(t);
-
-    _mm_storel_pi((__m64*)&r.mm, f);
-#else
-    r = p;
-#endif
-
-    return r;
-}
-
-ML_INLINE float4 float16_t4_to_float4(const float16_t4& p) {
-    float4 f;
-#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1)
-    v4i t = _mm_loadu_si64(&p);
-    f.xmm = _mm_cvtph_ps(t);
-#else
-    f = p;
-#endif
-
-    return f;
 }
 
 } // namespace Packing

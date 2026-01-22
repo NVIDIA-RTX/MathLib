@@ -2,7 +2,7 @@
 
 #pragma once
 
-// IMPORTANT: all components and predefined swizzles must be used only for "storage" operation:
+// IMPORTANT: all components and predefined swizzling must be used only for "storage" operation:
 //    float f32 = f16;   // OK, conversion operator gets involved
 //    float f32 = f16.x; // Wrong! "uint16_t" gets converted to "float" (a warning should be injected)
 
@@ -593,8 +593,8 @@ union float16_t4 {
 #endif
     }
 
-    ML_INLINE float16_t4(const float16_t2& xy, const float16_t2& zw)
-        : xy(xy.xy), zw(zw.xy) {
+    ML_INLINE float16_t4(const float16_t2& _xy, const float16_t2& _zw)
+        : xy(_xy.xy), zw(_zw.xy) {
     }
 
     ML_INLINE float16_t4() = default;
@@ -630,12 +630,12 @@ union float16_t8 {
 #endif
     }
 
-    ML_INLINE float16_t8(const float16_t2& Axy, const float16_t2& Azw, const float16_t2& Bxy, const float16_t2& Bzw)
-        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
+    ML_INLINE float16_t8(const float16_t2& _Axy, const float16_t2& _Azw, const float16_t2& _Bxy, const float16_t2& _Bzw)
+        : Axy(_Axy.xy), Azw(_Azw.xy), Bxy(_Bxy.xy), Bzw(_Bzw.xy) {
     }
 
-    ML_INLINE float16_t8(const float16_t4& a, const float16_t4& b)
-        : A(a.xyzw), B(b.xyzw) {
+    ML_INLINE float16_t8(const float16_t4& _A, const float16_t4& _B)
+        : A(_A.xyzw), B(_B.xyzw) {
     }
 
     ML_INLINE float16_t8() = default;
@@ -671,8 +671,8 @@ union float8_e4m3_t2 {
         uint8_t x, y;
     };
 
-    ML_INLINE float8_e4m3_t2(const float8_e4m3_t& x, const float8_e4m3_t& y)
-        : x(x.x), y(y.x) {
+    ML_INLINE float8_e4m3_t2(const float8_e4m3_t& _x, const float8_e4m3_t& _y)
+        : x(_x.x), y(_y.x) {
     }
 
     ML_INLINE float8_e4m3_t2() = default;
@@ -695,12 +695,12 @@ union float8_e4m3_t4 {
         uint8_t x, y, z, w;
     };
 
-    ML_INLINE float8_e4m3_t4(const float8_e4m3_t& x, const float8_e4m3_t& y, const float8_e4m3_t& z, const float8_e4m3_t& w)
-        : x(x.x), y(y.x), z(z.x), w(w.x) {
+    ML_INLINE float8_e4m3_t4(const float8_e4m3_t& _x, const float8_e4m3_t& _y, const float8_e4m3_t& _z, const float8_e4m3_t& _w)
+        : x(_x.x), y(_y.x), z(_z.x), w(_w.x) {
     }
 
-    ML_INLINE float8_e4m3_t4(const float8_e4m3_t2& xy, const float8_e4m3_t2& zw)
-        : xy(xy.xy), zw(zw.xy) {
+    ML_INLINE float8_e4m3_t4(const float8_e4m3_t2& _xy, const float8_e4m3_t2& _zw)
+        : xy(_xy.xy), zw(_zw.xy) {
     }
 
     ML_INLINE float8_e4m3_t4() = default;
@@ -727,17 +727,17 @@ union float8_e4m3_t8 {
         uint8_t Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
     };
 
-    ML_INLINE float8_e4m3_t8(const float8_e4m3_t& Ax, const float8_e4m3_t& Ay, const float8_e4m3_t& Az, const float8_e4m3_t& Aw,
-        const float8_e4m3_t& Bx, const float8_e4m3_t& By, const float8_e4m3_t& Bz, const float8_e4m3_t& Bw)
-        : Ax(Ax.x), Ay(Ay.x), Az(Az.x), Aw(Aw.x), Bx(Bx.x), By(By.x), Bz(Bz.x), Bw(Bw.x) {
+    ML_INLINE float8_e4m3_t8(const float8_e4m3_t& _Ax, const float8_e4m3_t& _Ay, const float8_e4m3_t& _Az, const float8_e4m3_t& _Aw,
+        const float8_e4m3_t& _Bx, const float8_e4m3_t& _By, const float8_e4m3_t& _Bz, const float8_e4m3_t& _Bw)
+        : Ax(_Ax.x), Ay(_Ay.x), Az(_Az.x), Aw(_Aw.x), Bx(_Bx.x), By(_By.x), Bz(_Bz.x), Bw(_Bw.x) {
     }
 
-    ML_INLINE float8_e4m3_t8(const float8_e4m3_t2& Axy, const float8_e4m3_t2& Azw, const float8_e4m3_t2& Bxy, const float8_e4m3_t2& Bzw)
-        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
+    ML_INLINE float8_e4m3_t8(const float8_e4m3_t2& _Axy, const float8_e4m3_t2& _Azw, const float8_e4m3_t2& _Bxy, const float8_e4m3_t2& _Bzw)
+        : Axy(_Axy.xy), Azw(_Azw.xy), Bxy(_Bxy.xy), Bzw(_Bzw.xy) {
     }
 
-    ML_INLINE float8_e4m3_t8(const float8_e4m3_t4& a, const float8_e4m3_t4& b)
-        : A(a.xyzw), B(b.xyzw) {
+    ML_INLINE float8_e4m3_t8(const float8_e4m3_t4& _A, const float8_e4m3_t4& _B)
+        : A(_A.xyzw), B(_B.xyzw) {
     }
 
     ML_INLINE float8_e4m3_t8() = default;
@@ -773,8 +773,8 @@ union float8_e5m2_t2 {
         uint8_t x, y;
     };
 
-    ML_INLINE float8_e5m2_t2(const float8_e5m2_t& x, const float8_e5m2_t& y)
-        : x(x.x), y(y.x) {
+    ML_INLINE float8_e5m2_t2(const float8_e5m2_t& _x, const float8_e5m2_t& _y)
+        : x(_x.x), y(_y.x) {
     }
 
     ML_INLINE float8_e5m2_t2() = default;
@@ -797,12 +797,12 @@ union float8_e5m2_t4 {
         uint8_t x, y, z, w;
     };
 
-    ML_INLINE float8_e5m2_t4(const float8_e5m2_t& x, const float8_e5m2_t& y, const float8_e5m2_t& z, const float8_e5m2_t& w)
-        : x(x.x), y(y.x), z(z.x), w(w.x) {
+    ML_INLINE float8_e5m2_t4(const float8_e5m2_t& _x, const float8_e5m2_t& _y, const float8_e5m2_t& _z, const float8_e5m2_t& _w)
+        : x(_x.x), y(_y.x), z(_z.x), w(_w.x) {
     }
 
-    ML_INLINE float8_e5m2_t4(const float8_e5m2_t2& xy, const float8_e5m2_t2& zw)
-        : xy(xy.xy), zw(zw.xy) {
+    ML_INLINE float8_e5m2_t4(const float8_e5m2_t2& _xy, const float8_e5m2_t2& _zw)
+        : xy(_xy.xy), zw(_zw.xy) {
     }
 
     ML_INLINE float8_e5m2_t4() = default;
@@ -829,17 +829,17 @@ union float8_e5m2_t8 {
         uint8_t Ax, Ay, Az, Aw, Bx, By, Bz, Bw;
     };
 
-    ML_INLINE float8_e5m2_t8(const float8_e5m2_t& Ax, const float8_e5m2_t& Ay, const float8_e5m2_t& Az, const float8_e5m2_t& Aw,
-        const float8_e5m2_t& Bx, const float8_e5m2_t& By, const float8_e5m2_t& Bz, const float8_e5m2_t& Bw)
-        : Ax(Ax.x), Ay(Ay.x), Az(Az.x), Aw(Aw.x), Bx(Bx.x), By(By.x), Bz(Bz.x), Bw(Bw.x) {
+    ML_INLINE float8_e5m2_t8(const float8_e5m2_t& _Ax, const float8_e5m2_t& _Ay, const float8_e5m2_t& _Az, const float8_e5m2_t& _Aw,
+        const float8_e5m2_t& _Bx, const float8_e5m2_t& _By, const float8_e5m2_t& _Bz, const float8_e5m2_t& _Bw)
+        : Ax(_Ax.x), Ay(_Ay.x), Az(_Az.x), Aw(_Aw.x), Bx(_Bx.x), By(_By.x), Bz(_Bz.x), Bw(_Bw.x) {
     }
 
-    ML_INLINE float8_e5m2_t8(const float8_e5m2_t2& Axy, const float8_e5m2_t2& Azw, const float8_e5m2_t2& Bxy, const float8_e5m2_t2& Bzw)
-        : Axy(Axy.xy), Azw(Azw.xy), Bxy(Bxy.xy), Bzw(Bzw.xy) {
+    ML_INLINE float8_e5m2_t8(const float8_e5m2_t2& _Axy, const float8_e5m2_t2& _Azw, const float8_e5m2_t2& _Bxy, const float8_e5m2_t2& _Bzw)
+        : Axy(_Axy.xy), Azw(_Azw.xy), Bxy(_Bxy.xy), Bzw(_Bzw.xy) {
     }
 
-    ML_INLINE float8_e5m2_t8(const float8_e5m2_t4& a, const float8_e5m2_t4& b)
-        : A(a.xyzw), B(b.xyzw) {
+    ML_INLINE float8_e5m2_t8(const float8_e5m2_t4& _A, const float8_e5m2_t4& _B)
+        : A(_A.xyzw), B(_B.xyzw) {
     }
 
     ML_INLINE float8_e5m2_t8() = default;

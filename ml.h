@@ -31,19 +31,6 @@ IMPORTANT:
 // #define ML_NAMESPACE
 #endif
 
-// Select intrinsic level (try to guess)
-#ifndef ML_INTRINSIC_LEVEL
-#    if (defined(__AVX2__) && defined(__FMA__))
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX2
-#    elif defined(__F16C__)
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX1
-#    elif defined(__SSE4_2__)
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE4
-#    else
-#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE3
-#    endif
-#endif
-
 // ARM?
 #if (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || defined(_M_ARM64))
 #    define ML_ARM
@@ -51,6 +38,19 @@ IMPORTANT:
 
 #if (defined(__ARM_NEON) || defined(__ARM_FP16) || defined(__aarch64__))
 #    define ML_NATIVE_FLOAT16_T
+#endif
+
+// Select intrinsic level (try to guess)
+#ifndef ML_INTRINSIC_LEVEL
+#    if (defined(__AVX2__) && defined(__FMA__))
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX2
+#    elif defined(__F16C__)
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_AVX1
+#    elif (defined(__SSE4_2__) || defined(ML_ARM))
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE4 // TODO: seems to be the safest choice for "sse2neon"
+#    else
+#        define ML_INTRINSIC_LEVEL ML_INTRINSIC_SSE3
+#    endif
 #endif
 
 // SVML availability

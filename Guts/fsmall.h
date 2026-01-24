@@ -529,8 +529,10 @@ ML_INLINE float f16tof32(uint32_t x) {
 #ifdef ML_NATIVE_FLOAT16_T
 typedef float16_t fp16_storage;
 #else
+typedef uint16_t fp16_storage;
+
 struct float16_t {
-    uint16_t x; // TODO: this is only for internal needs, avoid using ".x" in your code, since native "float16_t" on ARM doesn't have it
+    fp16_storage x; // TODO: this is only for internal needs, avoid using ".x" in your code, since native "float16_t" on ARM doesn't have it
 
     ML_INLINE float16_t() = default;
     ML_INLINE float16_t(const float16_t&) = default;
@@ -539,15 +541,13 @@ struct float16_t {
     // Conversion
 
     ML_INLINE float16_t(float v) {
-        x = (uint16_t)f32tof16(v);
+        x = (fp16_storage)f32tof16(v);
     }
 
     ML_INLINE operator float() const {
         return f16tof32(x);
     }
 };
-
-typedef uint16_t fp16_storage;
 #endif
 
 union float16_t2 {

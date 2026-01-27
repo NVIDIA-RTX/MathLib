@@ -849,7 +849,7 @@ namespace Color
         return mul( M, x );
     }
 
-        // DCIP3
+    // DCIP3
 
     ML_INLINE float3 RgbToDcip3( float3 x )
     {

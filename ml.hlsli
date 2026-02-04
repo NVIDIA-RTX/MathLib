@@ -19,7 +19,9 @@
 // Settings
 //===========================================================================================================================
 
-#define ML_WINDOW_ORIGIN_OGL                       0
+#ifndef ML_WINDOW_ORIGIN_OGL
+    #define ML_WINDOW_ORIGIN_OGL                   0
+#endif
 
 // Math
 #define ML_SIGN_DEFAULT                            ML_SIGN_FAST

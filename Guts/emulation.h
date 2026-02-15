@@ -162,6 +162,7 @@ ML_INLINE int emu_mm_testnzc_si128(const __m128i& x, const __m128i& y) {
 
 template <int32_t imm>
 ML_INLINE __m128 emu_mm_round_ps(const __m128& x) {
+    ML_Unused(x);
     ML_StaticAssertMsg(imm != imm, "Unsupported rounding mode!");
 
     return _mm_setzero_ps();
@@ -199,6 +200,7 @@ ML_INLINE __m128 emu_mm_round_ps<_MM_FROUND_CEIL | ML_ROUNDING_EXEPTIONS_MASK>(c
 
 template <int32_t imm>
 ML_INLINE __m128d emu_mm_round_pd(const __m128d& x) {
+    ML_Unused(x);
     ML_StaticAssertMsg(imm != imm, "Unsupported rounding mode!");
 
     return _mm_setzero_pd();
@@ -238,6 +240,7 @@ ML_INLINE __m128d emu_mm_round_pd<_MM_FROUND_CEIL | ML_ROUNDING_EXEPTIONS_MASK>(
 
 template <int32_t imm>
 ML_INLINE __m128 emu_mm_dp_ps(const __m128& x, const __m128& y) {
+    ML_Unused(x, y);
     ML_StaticAssertMsg(imm != imm, "Unsupported dp mode!");
 
     return _mm_setzero_ps();

@@ -11,7 +11,7 @@ endif()
 
 # Download sse2neon for ARM
 if(IS_ARM64)
-    FetchContent_Declare(
+    fetchcontent_declare(
         sse2neon
         GIT_REPOSITORY https://github.com/DLTcollab/sse2neon.git
         GIT_TAG master
@@ -19,7 +19,7 @@ if(IS_ARM64)
     )
 
     message("MathLib: Downloading sse2neon...")
-    FetchContent_MakeAvailable(sse2neon)
+    fetchcontent_makeavailable(sse2neon)
 endif()
 
 # Sources

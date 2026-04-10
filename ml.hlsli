@@ -1660,13 +1660,13 @@ namespace Sequence
     { return float3( Halton2( n ), Halton( n, 3 ), Halton( n, 5 ) ); }
 
     // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
-    ML_INLINE float Weyl1D( float p, int n )
+    ML_INLINE float Weyl1D( float p, uint n )
     { return frac( p + float( n * 10368889 ) / exp2( 24.0f ) ); }
 
-    ML_INLINE float2 Weyl2D( float2 p, int n )
+    ML_INLINE float2 Weyl2D( float2 p, uint n )
     { return frac( p + float2( float( n * 12664745 ), float( n * 9560333 ) ) / exp2( 24.0f ) ); }
 
-    ML_INLINE float3 Weyl3D( float3 p, int n )
+    ML_INLINE float3 Weyl3D( float3 p, uint n )
     { return frac( p + float3( float( n * 13743434 ), float( n * 11258243 ), float( n * 9222443 ) ) / exp2( 24.0f ) ); }
 }
 

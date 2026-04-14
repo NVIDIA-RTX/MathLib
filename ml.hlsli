@@ -384,6 +384,11 @@ namespace Math
     { return dot( abs( a - b ), 1.0f ); }
 
     // Bit operations
+    ML_INLINE uint ReverseBits2( uint x )
+    {
+        return ( ( x & 0x1 ) << 1 ) | ( ( x & 0x2 ) >> 1 );
+    }
+
     ML_INLINE uint ReverseBits4( uint x )
     {
         x = ( ( x & 0x5 ) << 1 ) | ( ( x & 0xA ) >> 1 );
@@ -1531,24 +1536,41 @@ namespace Sequence
     #define ML_BAYER_LINEAR 0
     #define ML_BAYER_REVERSEBITS 1
 
+    // RESULT: [0; 3]
+    ML_INLINE uint Bayer2x2ui( uint2 samplePos, uint frameIndex, compiletime const uint mode = ML_BAYER_DEFAULT )
+    {
+        uint2 p = samplePos & 1;
+        uint b = ( p.y << 1 ) | ( p.y ^ p.x );
+
+        uint sampleOffset = mode == ML_BAYER_REVERSEBITS ? Math::ReverseBits2( frameIndex ) : frameIndex;
+
+        return ( b + sampleOffset ) & 0x3;
+    }
+
     // RESULT: [0; 15]
     ML_INLINE uint Bayer4x4ui( uint2 samplePos, uint frameIndex, compiletime const uint mode = ML_BAYER_DEFAULT )
     {
-        uint2 samplePosWrap = samplePos & 3;
-        uint a = 2068378560 * ( 1 - ( samplePosWrap.x >> 1 ) ) + 1500172770 * ( samplePosWrap.x >> 1 );
-        uint b = ( samplePosWrap.y + ( ( samplePosWrap.x & 1 ) << 2 ) ) << 2;
+        uint2 p = samplePos & 3;
+        uint b = ( ( p.y & 1 ) << 2 ) | ( ( p.x & 1 ) << 3 ) | ( ( p.y & 2 ) >> 1 ) | ( p.x & 2 );
 
         uint sampleOffset = mode == ML_BAYER_REVERSEBITS ? Math::ReverseBits4( frameIndex ) : frameIndex;
 
-        return ( ( a >> b ) + sampleOffset ) & 0xF;
+        return ( b + sampleOffset ) & 0xF;
     }
 
     // RESULT: [0; 1)
+    ML_INLINE float Bayer2x2( uint2 samplePos, uint frameIndex, compiletime const uint mode = ML_BAYER_DEFAULT )
+    {
+        uint bayer = Bayer2x2ui( samplePos, frameIndex, mode );
+
+        return ( bayer + 0.5f ) / 4.0f;
+    }
+
     ML_INLINE float Bayer4x4( uint2 samplePos, uint frameIndex, compiletime const uint mode = ML_BAYER_DEFAULT )
     {
         uint bayer = Bayer4x4ui( samplePos, frameIndex, mode );
 
-        return float( bayer ) / 16.0f;
+        return ( bayer + 0.5f ) / 16.0f;
     }
 
     // https://en.wikipedia.org/wiki/Low-discrepancy_sequence

@@ -32,7 +32,7 @@ IMPORTANT:
 #endif
 
 // ARM?
-#if (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || defined(_M_ARM64))
+#if (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC))
 #    define ML_ARM
 #endif
 

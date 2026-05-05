@@ -143,11 +143,14 @@ ML_INLINE float FromSmallFloat(uint32_t x) {
     if constexpr (!FORMAT::inf)
         res = (x & EM_MASK) == EM_MASK ? 0x7FC00000 : res;
 
-    // Denorm
+    // Denorm (slow path)
     if (e == 0) {
-        // Slow path
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
+    #if defined(ML_ARM)
+        uint32_t lz = _CountLeadingZeros(m);
+    #else
         uint32_t lz = __lzcnt(m);
+    #endif
 #else
         uint32_t lz = __builtin_clz(m | 0x1);
 #endif

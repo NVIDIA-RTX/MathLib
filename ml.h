@@ -32,7 +32,9 @@ IMPORTANT:
 #endif
 
 // ARM?
-#if (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC))
+#ifdef _M_ARM64EC
+#    define ML_ARM_EC // emulation compatible
+#elif (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || defined(_M_ARM64))
 #    define ML_ARM
 #endif
 
@@ -55,7 +57,7 @@ IMPORTANT:
 
 // SVML availability
 #ifndef ML_SVML_AVAILABLE
-#    ifdef ML_ARM
+#    if (defined(ML_ARM) || defined(ML_ARM_EC))
 #        define ML_SVML_AVAILABLE 0
 #    else
 #        define ML_SVML_AVAILABLE (_MSC_VER >= 1920 && __clang__ == 0)

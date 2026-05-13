@@ -119,16 +119,19 @@ IMPORTANT:
 #if defined(__GNUC__)
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#    pragma GCC diagnostic ignored "-Wunused-parameter" // TODO: caused by "sse2neon"
 
 #    define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
 #elif defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wstrict-aliasing"
+#    pragma clang diagnostic ignored "-Wunused-parameter" // TODO: caused by "sse2neon"
 
 #    define ML_ALIGN(alignment, x) x __attribute__((aligned(alignment)))
 #else
 #    pragma warning(push)
 #    pragma warning(disable : 4201) // nonstandard extension used: nameless struct/union
+#    pragma warning(disable : 4100) // unreferenced parameter // TODO: caused by "sse2neon"
 
 #    define ML_ALIGN(alignment, x) __declspec(align(alignment)) x
 #endif

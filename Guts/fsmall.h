@@ -64,9 +64,9 @@ struct fp8_e4m3 {
 // Scalar
 template <typename FORMAT>
 ML_INLINE uint32_t ToSmallFloat(float x) {
-    constexpr uint32_t E_BITS = FORMAT::eBits;
-    constexpr uint32_t M_BITS = FORMAT::mBits;
-    constexpr int32_t E_BIAS = 127 - ((1 << (int32_t(E_BITS) - 1)) - 1);
+    constexpr int32_t E_BITS = (int32_t)FORMAT::eBits;
+    constexpr int32_t M_BITS = (int32_t)FORMAT::mBits;
+    constexpr int32_t E_BIAS = 127 - ((1 << (E_BITS - 1)) - 1);
     constexpr uint32_t E_MASK = (1u << E_BITS) - 1u;
     constexpr uint32_t M_MASK = (1u << M_BITS) - 1u;
     constexpr uint32_t M_SHIFT = 23u - M_BITS;
@@ -122,9 +122,9 @@ ML_INLINE uint32_t ToSmallFloat(float x) {
 
 template <typename FORMAT>
 ML_INLINE float FromSmallFloat(uint32_t x) {
-    constexpr uint32_t E_BITS = FORMAT::eBits;
-    constexpr uint32_t M_BITS = FORMAT::mBits;
-    constexpr uint32_t E_BIAS = 127 - ((1 << (E_BITS - 1)) - 1);
+    constexpr int32_t E_BITS = (int32_t)FORMAT::eBits;
+    constexpr int32_t M_BITS = (int32_t)FORMAT::mBits;
+    constexpr int32_t E_BIAS = 127 - ((1 << (E_BITS - 1)) - 1);
     constexpr uint32_t E_MASK = (1u << E_BITS) - 1u;
     constexpr uint32_t M_MASK = (1u << M_BITS) - 1u;
     constexpr uint32_t M_SHIFT = 23 - M_BITS;
@@ -170,9 +170,9 @@ ML_INLINE float FromSmallFloat(uint32_t x) {
 // Vector4
 template <typename FORMAT>
 ML_INLINE v4i ToSmallFloat4(v4f x) {
-    constexpr uint32_t E_BITS = FORMAT::eBits;
-    constexpr uint32_t M_BITS = FORMAT::mBits;
-    constexpr int32_t E_BIAS = 127 - ((1 << (int32_t(E_BITS) - 1)) - 1);
+    constexpr int32_t E_BITS = (int32_t)FORMAT::eBits;
+    constexpr int32_t M_BITS = (int32_t)FORMAT::mBits;
+    constexpr int32_t E_BIAS = 127 - ((1 << (E_BITS - 1)) - 1);
     constexpr uint32_t E_MASK = (1u << E_BITS) - 1u;
     constexpr uint32_t M_MASK = (1u << M_BITS) - 1u;
     constexpr uint32_t M_SHIFT = 23u - M_BITS;
@@ -236,9 +236,9 @@ ML_INLINE v4i ToSmallFloat4(v4f x) {
 
 template <typename FORMAT>
 ML_INLINE v4f FromSmallFloat4(v4i x) {
-    constexpr uint32_t E_BITS = FORMAT::eBits;
-    constexpr uint32_t M_BITS = FORMAT::mBits;
-    constexpr uint32_t E_BIAS = 127 - ((1 << (E_BITS - 1)) - 1);
+    constexpr int32_t E_BITS = (int32_t)FORMAT::eBits;
+    constexpr int32_t M_BITS = (int32_t)FORMAT::mBits;
+    constexpr int32_t E_BIAS = 127 - ((1 << (E_BITS - 1)) - 1);
     constexpr uint32_t E_MASK = (1u << E_BITS) - 1u;
     constexpr uint32_t M_MASK = (1u << M_BITS) - 1u;
     constexpr uint32_t M_SHIFT = 23 - M_BITS;

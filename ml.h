@@ -140,20 +140,21 @@ IMPORTANT:
 
 // Headers
 
-#include <cmath>   // overloaded floor, round, ceil, fmod, sin, cos, tan, asin, acos, atan, atan2, sqrt, pow, log, log2, exp, exp2
+#include <cmath> // overloaded floor, round, ceil, fmod, sin, cos, tan, asin, acos, atan, atan2, sqrt, pow, log, log2, exp, exp2
+#include <cstdint>
 #include <cstdlib> // overloaded abs
 
-#include <stdint.h>
-
-#ifndef _WIN32
-#    include <unistd.h> // TODO: needed?
-#endif
-
-#if (defined(__i386__) || defined(__x86_64__) || defined(__SCE__))
-#    include <x86intrin.h>
-#elif (defined(ML_ARM))
+#if (defined(ML_ARM))
+// emulate SSE on native ARM
 #    include "sse2neon.h"
-#else
+#elif (defined(ML_ARM_EC))
+// "emulation compatibility" allows to use SSE "as is" but only through this header
+#    include <intrin.h>
+#elif (defined(__x86_64__) || defined(__SCE__))
+// GCC/Clang
+#    include <x86intrin.h>
+#elif (defined(_MSC_VER))
+// MSVC
 #    include <mmintrin.h>
 #    if (ML_SVML_AVAILABLE || ML_INTRINSIC_LEVEL >= ML_INTRINSIC_AVX1)
 #        include <immintrin.h> // SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2, FMA, SVML
@@ -162,9 +163,12 @@ IMPORTANT:
 #    else
 #        include <tmmintrin.h> // SSE, SSE2, SSE3, SSSE3
 #    endif
+#else
+#    error "Unsupported compiler and/or platform!"
 #endif
 
 // Misc
+
 #define ML_Unused(...) \
     do { \
         (void)sizeof(__VA_ARGS__); \

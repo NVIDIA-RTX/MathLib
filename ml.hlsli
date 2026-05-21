@@ -288,23 +288,50 @@ namespace Math
         return 1.0f / sqrt( mode == ML_POSITIVE_RSQRT_ACCURATE ? x : max( x, ML_SMALL_EPS ) );
     }
 
-    // Acos(x) (approximate)
-    // https://www.desmos.com/calculator/x6ut8ros1u
-    #define _AcosApprox( x ) ( sqrt( 2.0f ) * sqrt( saturate( 1.0f - x ) ) )
+    // Acos(x) (approximate, for range [0; 1])
+    // https://www.desmos.com/calculator/lalz2fkalj
+    #if 0
+        // max error = ~0.24 deg, 90 deg at 0
+        #define _AcosApproxPositive( x ) ( lerp( 1.570796f, 1.395402f, saturate( x ) ) * sqrt( saturate( 1.0f - x ) ) )
+    #else
+        // max error = ~0.18 deg, 89.816 deg at 0
+        #define _AcosApproxPositive( x ) ( lerp( 1.567589f, 1.399331f, saturate( x ) ) * sqrt( saturate( 1.0f - x ) ) )
+    #endif
 
+    ML_INLINE float AcosApproxPositive( float x )
+    { return _AcosApproxPositive( x ); }
+
+    ML_INLINE float2 AcosApproxPositive( float2 x )
+    { return _AcosApproxPositive( x ); }
+
+    ML_INLINE float3 AcosApproxPositive( float3 x )
+    { return _AcosApproxPositive( x ); }
+
+    ML_INLINE float4 AcosApproxPositive( float4 x )
+    { return _AcosApproxPositive( x ); }
+
+    // Acos(x) (approximate, for range [-1; 1])
     ML_INLINE float AcosApprox( float x )
-    { return _AcosApprox( x ); }
+    {
+        // https://seblagarde.wordpress.com/2014/12/01/inverse-trigonometric-functions-gpu-optimization-for-amd-gcn-architecture/
+        // max error = ~0.51 deg
+        float a = saturate( abs( x ) );
+        float b = ( Math::Pi( 0.5f ) - 0.156583f * a ) * sqrt( 1.0f - a );
+        float r = x >= 0.0f ? b : ( Math::Pi( 1.0f ) - b );
+
+        return r;
+    }
 
     ML_INLINE float2 AcosApprox( float2 x )
-    { return _AcosApprox( x ); }
+    { return float2( AcosApprox( x.x ), AcosApprox( x.y ) ); }
 
     ML_INLINE float3 AcosApprox( float3 x )
-    { return _AcosApprox( x ); }
+    { return float3( AcosApprox( x.x ), AcosApprox( x.y ), AcosApprox( x.z ) ); }
 
     ML_INLINE float4 AcosApprox( float4 x )
-    { return _AcosApprox( x ); }
+    { return float4( AcosApprox( x.x ), AcosApprox( x.y ), AcosApprox( x.z ), AcosApprox( x.w ) ); }
 
-    // Atan(x) (approximate, for x in range [-1; 1])
+    // Atan(x) (approximate, for range [-1; 1])
     // https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1628884
     // https://www.desmos.com/calculator/0h8hv7kfp6
     #define _AtanApprox( x ) ( Math::Pi( 0.25f ) * x - ( abs( x ) * x - x ) * ( 0.2447f + 0.0663f * abs( x ) ) )

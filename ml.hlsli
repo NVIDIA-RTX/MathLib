@@ -1686,7 +1686,7 @@ namespace Sequence
         float b = 0.0f;
         float baseInv = 1.0f / ( float )base;
 
-        while( n )
+        while( n != 0 )
         {
             a *= baseInv;
             b += a * float( n % base );
@@ -3036,7 +3036,7 @@ namespace Text
                 uint2 p = state.xy / state.z; \
                 uint bits = font[ ch ]; \
                 uint bit = bits & ( 1u << ( p.y * CHAR_W + p.x ) ); \
-                state.w = bit ? FOREGROUND : BACKGROUND; \
+                state.w = ( bit != 0 ) ? FOREGROUND : BACKGROUND; \
             }
 
     #endif
@@ -3070,7 +3070,7 @@ namespace Text
     ML_INLINE void Print_ui( uint x, ML_INOUT( uint4 ) state )
     {
         [unroll] // FXC: avoid "X3557: loop only executes for N iteration(s), forcing loop to unroll"
-        while( x )
+        while( x != 0 )
         {
             uint a = x / 10;
             uint digit = x - a * 10;

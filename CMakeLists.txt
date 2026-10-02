@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22...3.30)
+cmake_minimum_required(VERSION 3.30)
 
 include(FetchContent)
 
@@ -13,9 +13,10 @@ endif()
 if(IS_ARM64)
     fetchcontent_declare(
         sse2neon
-        GIT_REPOSITORY https://github.com/DLTcollab/sse2neon.git
-        GIT_TAG master
-        GIT_SHALLOW 1
+        DOWNLOAD_EXTRACT_TIMESTAMP 1
+        DOWNLOAD_NO_PROGRESS 1
+        SOURCE_SUBDIR "ignore CMakeLists.txt"
+        URL "https://github.com/DLTcollab/sse2neon/archive/refs/heads/master.zip"
     )
 
     message("MathLib: Downloading sse2neon...")
@@ -23,23 +24,54 @@ if(IS_ARM64)
 endif()
 
 # Sources
-file(GLOB MATHLIB_H
+set(MATHLIB_H
     "ml.h"
     "ml.hlsli"
 )
-source_group("MathLib" FILES ${MATHLIB_H})
+source_group("MathLib"
+    FILES
+        ${MATHLIB_H}
+)
 
-file(GLOB MATHLIB_GUTS "Guts/*")
-source_group("MathLib/Guts" FILES ${MATHLIB_GUTS})
+set(MATHLIB_GUTS
+    "Guts/bool1.h"
+    "Guts/conversion.h"
+    "Guts/emulation.h"
+    "Guts/f32.h"
+    "Guts/f64.h"
+    "Guts/fsmall.h"
+    "Guts/i32.h"
+    "Guts/math.h"
+    "Guts/other.h"
+    "Guts/packing.h"
+    "Guts/sorting.h"
+    "Guts/swizzle.h"
+    "Guts/tests.h"
+    "Guts/u32.h"
+)
+source_group("MathLib/Guts"
+    FILES
+        ${MATHLIB_GUTS}
+)
 
-set_property(SOURCE "ml.hlsli" PROPERTY VS_SETTINGS "ExcludedFromBuild=true")
+set_source_files_properties("ml.hlsli"
+    PROPERTIES
+        VS_SETTINGS "ExcludedFromBuild=true"
+)
 
 # Library
 add_library(MathLib INTERFACE)
 
 if(WIN32) # TODO: is MSVC?
-    target_sources(MathLib PRIVATE ${MATHLIB_H} ${MATHLIB_GUTS})
-    set_target_properties(MathLib PROPERTIES FOLDER "MathLib")
+    target_sources(MathLib
+        PRIVATE
+            ${MATHLIB_H}
+            ${MATHLIB_GUTS}
+    )
+    set_target_properties(MathLib
+        PROPERTIES
+            FOLDER "MathLib"
+    )
 endif()
 
 if(IS_ARM64 AND MSVC)
@@ -52,7 +84,8 @@ if(IS_ARM64 AND MSVC)
     )
 endif()
 
-target_include_directories(MathLib INTERFACE
-    .
-    $<$<BOOL:${IS_ARM64}>:${sse2neon_SOURCE_DIR}>
+target_include_directories(MathLib
+    INTERFACE
+        "."
+        $<$<BOOL:${IS_ARM64}>:${sse2neon_SOURCE_DIR}>
 )

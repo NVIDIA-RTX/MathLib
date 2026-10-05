@@ -383,8 +383,14 @@ ML_INLINE v4f v4f_linearstep(const v4f& edge0, const v4f& edge1, const v4f& x) {
     return v4f_saturate(div0);
 }
 
-ML_INLINE v4f v4f_length(const v4f& x) {
+ML_INLINE v4f v4f_length3(const v4f& x) {
     v4f r = v4f_dot33(x, x);
+
+    return _mm_sqrt_ps(r);
+}
+
+ML_INLINE v4f v4f_length(const v4f& x) {
+    v4f r = v4f_dot44(x, x);
 
     return _mm_sqrt_ps(r);
 }
@@ -456,8 +462,15 @@ ML_INLINE v4f v4f_smoothstep(const v4f& edge0, const v4f& edge1, const v4f& x) {
     return _mm_mul_ps(t, c);
 }
 
-ML_INLINE v4f v4f_normalize(const v4f& x) {
+ML_INLINE v4f v4f_normalize3(const v4f& x) {
     v4f r = v4f_dot33(x, x);
+    r = v4f_rsqrt(r);
+
+    return _mm_mul_ps(x, r);
+}
+
+ML_INLINE v4f v4f_normalize(const v4f& x) {
+    v4f r = v4f_dot44(x, x);
     r = v4f_rsqrt(r);
 
     return _mm_mul_ps(x, r);
@@ -610,8 +623,14 @@ ML_INLINE v4d v4d_linearstep(const v4d& edge0, const v4d& edge1, const v4d& x) {
     return v4d_saturate(div0);
 }
 
-ML_INLINE v4d v4d_length(const v4d& x) {
+ML_INLINE v4d v4d_length3(const v4d& x) {
     v4d r = v4d_dot33(x, x);
+
+    return _mm256_sqrt_pd(r);
+}
+
+ML_INLINE v4d v4d_length(const v4d& x) {
+    v4d r = v4d_dot44(x, x);
 
     return _mm256_sqrt_pd(r);
 }
@@ -685,8 +704,15 @@ ML_INLINE v4d v4d_smoothstep(const v4d& edge0, const v4d& edge1, const v4d& x) {
     return _mm256_mul_pd(t, c);
 }
 
-ML_INLINE v4d v4d_normalize(const v4d& x) {
+ML_INLINE v4d v4d_normalize3(const v4d& x) {
     v4d r = v4d_dot33(x, x);
+    r = v4d_rsqrt(r);
+
+    return _mm256_mul_pd(x, r);
+}
+
+ML_INLINE v4d v4d_normalize(const v4d& x) {
+    v4d r = v4d_dot44(x, x);
     r = v4d_rsqrt(r);
 
     return _mm256_mul_pd(x, r);

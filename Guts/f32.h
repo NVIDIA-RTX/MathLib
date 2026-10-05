@@ -473,13 +473,13 @@ ML_INLINE float dot(const float3& a, const float3& b) {
 }
 
 ML_INLINE float length(const float3& x) {
-    v4f r = v4f_length(x.xmm);
+    v4f r = v4f_length3(x.xmm);
 
     return _mm_cvtss_f32(r);
 }
 
 ML_INLINE float3 normalize(const float3& x) {
-    return v4f_normalize(x.xmm);
+    return v4f_normalize3(x.xmm);
 }
 
 ML_INLINE float3 cross(const float3& x, const float3& y) {
@@ -794,6 +794,16 @@ ML_INLINE float dot(const float4& a, const float4& b) {
     return _mm_cvtss_f32(r);
 }
 
+ML_INLINE float length(const float4& x) {
+    v4f r = v4f_length(x.xmm);
+
+    return _mm_cvtss_f32(r);
+}
+
+ML_INLINE float4 normalize(const float4& x) {
+    return v4f_normalize(x.xmm);
+}
+
 // Non-HLSL
 
 ML_INLINE float4 Pi(const float4& mul) {
@@ -1055,7 +1065,7 @@ public:
     }
 
     ML_INLINE float3 GetScale() const {
-        float3 scale = float3(_mm_cvtss_f32(v4f_length(ca[0])), _mm_cvtss_f32(v4f_length(ca[1])), _mm_cvtss_f32(v4f_length(ca[2])));
+        float3 scale = float3(_mm_cvtss_f32(v4f_length3(ca[0])), _mm_cvtss_f32(v4f_length3(ca[1])), _mm_cvtss_f32(v4f_length3(ca[2])));
 
         return scale;
     }
@@ -1800,7 +1810,7 @@ public:
     ML_INLINE float Distance(const float3& from) const {
         v4f p = v4f_clamp(from.xmm, vMin.xmm, vMax.xmm);
         p = _mm_sub_ps(p, from.xmm);
-        p = v4f_length(p);
+        p = v4f_length3(p);
 
         return _mm_cvtss_f32(p);
     }

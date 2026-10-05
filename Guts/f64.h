@@ -476,13 +476,13 @@ ML_INLINE double dot(const double3& a, const double3& b) {
 }
 
 ML_INLINE double length(const double3& x) {
-    v4d r = v4d_length(x.ymm);
+    v4d r = v4d_length3(x.ymm);
 
     return _mm256_cvtsd_f64(r);
 }
 
 ML_INLINE double3 normalize(const double3& x) {
-    return v4d_normalize(x.ymm);
+    return v4d_normalize3(x.ymm);
 }
 
 ML_INLINE double3 cross(const double3& x, const double3& y) {
@@ -794,6 +794,16 @@ ML_INLINE double dot(const double4& a, const double4& b) {
     return _mm256_cvtsd_f64(r);
 }
 
+ML_INLINE double length(const double4& x) {
+    v4d r = v4d_length(x.ymm);
+
+    return _mm256_cvtsd_f64(r);
+}
+
+ML_INLINE double4 normalize(const double4& x) {
+    return v4d_normalize(x.ymm);
+}
+
 // non-HLSL
 
 ML_INLINE double4 Pi(const double4& mul) {
@@ -1055,7 +1065,7 @@ public:
     }
 
     ML_INLINE double3 GetScale() const {
-        double3 scale = double3(_mm256_cvtsd_f64(v4d_length(ca[0])), _mm256_cvtsd_f64(v4d_length(ca[1])), _mm256_cvtsd_f64(v4d_length(ca[2])));
+        double3 scale = double3(_mm256_cvtsd_f64(v4d_length3(ca[0])), _mm256_cvtsd_f64(v4d_length3(ca[1])), _mm256_cvtsd_f64(v4d_length3(ca[2])));
 
         return scale;
     }
@@ -1801,7 +1811,7 @@ public:
     ML_INLINE double Distance(const double3& from) const {
         v4d p = v4d_clamp(from.ymm, vMin.ymm, vMax.ymm);
         p = _mm256_sub_pd(p, from.ymm);
-        p = v4d_length(p);
+        p = v4d_length3(p);
 
         return _mm256_cvtsd_f64(p);
     }

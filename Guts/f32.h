@@ -28,7 +28,7 @@ public:
         : x(c), y(c) {
     }
 
-    ML_INLINE float2(float _x, float _y)
+    constexpr ML_INLINE float2(float _x, float _y)
         : x(_x), y(_y) {
     }
 
@@ -824,7 +824,185 @@ ML_INLINE float4 SinCos(const float4& x, float4* pCos) {
     return _mm_sincos_ps(&pCos->xmm, x.xmm);
 }
 
-// TODO: add "Quaternion"
+//======================================================================================================================
+// Quaternion
+//======================================================================================================================
+
+union Quaternion {
+    v4f xmm;
+
+    struct {
+        float a[COORD_4D];
+    };
+
+    struct {
+        float x, y, z, w;
+    };
+    
+    struct {
+        float4 q;
+    };
+
+    ML_SWIZZLE_4(v4f_swizzle2, float2, v4f_swizzle3, float3, v4f_swizzle4, float4);
+    
+    
+    ML_INLINE Quaternion()
+    : xmm(_mm_setzero_ps()) {
+    }
+
+    ML_INLINE Quaternion(float c) // set only scalar part.
+        : Quaternion() {
+        w = c;
+    }
+    
+    explicit ML_INLINE Quaternion(const float3& v)
+        : xmm(v.xmm) {
+        
+    }
+    
+    explicit ML_INLINE Quaternion(const float4& _q) 
+        : xmm(_q.xmm) {
+    }
+    
+    ML_INLINE Quaternion(float _x, float _y, float _z, float _w)
+        : xmm(v4f_set(_x, _y, _z, _w)) {
+    }
+
+    // float4 order fills quaternion directly. 
+    ML_INLINE Quaternion(const float3& v, float _w)
+        : xmm(v4f_set(v.x, v.y, v.z, _w)) {
+    }
+    
+    // Inverse order is angle-axis constructor.
+    ML_INLINE Quaternion(float rad, const float3& axis) 
+        : q(axis * sin(rad * 0.5F), cos(rad * 0.5F)) {
+    }
+
+    ML_INLINE Quaternion(const v4f& v)
+        : xmm(v) {
+    }
+
+    ML_INLINE Quaternion(const float* v4)
+        : xmm(_mm_loadu_ps(v4)) {
+    }
+
+    ML_INLINE Quaternion(const Quaternion& v) = default;
+
+    // Set
+
+    ML_INLINE void operator=(const Quaternion& v) {
+        xmm = v.xmm;
+    }
+    
+    ML_INLINE operator float4() const { return q; }
+    
+    ML_COMPARE(bool4, Quaternion, <, _mm_cmplt_ps, _mm_movemask_ps, xmm)
+    ML_COMPARE(bool4, Quaternion, <=, _mm_cmple_ps, _mm_movemask_ps, xmm)
+    ML_COMPARE(bool4, Quaternion, ==, _mm_cmpeq_ps, _mm_movemask_ps, xmm)
+    ML_COMPARE(bool4, Quaternion, >, _mm_cmpgt_ps, _mm_movemask_ps, xmm)
+    ML_COMPARE(bool4, Quaternion, >=, _mm_cmpge_ps, _mm_movemask_ps, xmm)
+    ML_COMPARE(bool4, Quaternion, !=, _mm_cmpneq_ps, _mm_movemask_ps, xmm)
+
+    ML_OP(Quaternion, float, -, -=, _mm_sub_ps, _mm_set1_ps, xmm)
+    ML_OP(Quaternion, float, +, +=, _mm_add_ps, _mm_set1_ps, xmm)
+    
+    ML_INLINE Quaternion operator-() const {
+        return v4f_negate(xmm);
+    }
+    
+    ML_INLINE Quaternion Conjugate() const {
+        return v4f_negate3(xmm);
+    }
+    
+    ML_INLINE float      Norm()      const {
+        return dot(q, q);
+    }
+    
+    ML_INLINE Quaternion Inverse()   const {
+        return Conjugate() / Norm();
+    }
+    
+    ML_INLINE Quaternion operator*(const Quaternion& _q) const {
+        return Quaternion(w * _q.xyz + xyz * _q.w + cross(xyz, _q.xyz), dot(*this, _q.Conjugate()));
+    }
+    
+    ML_INLINE Quaternion operator/(const Quaternion& _q) const {
+        return Quaternion(xyz * _q.w - w * _q.xyz - cross(xyz, _q.xyz), dot(*this, _q)) / _q.Norm();
+    }
+    
+    ML_INLINE Quaternion operator*(float a) const {
+        return Quaternion(q * a);
+    }
+    
+    ML_INLINE Quaternion operator/(float a) const {
+        return Quaternion(q / a);
+    }
+
+    // Rodrigues rotation, only works when *this is a unit quaternion.
+    // v + 2w(q x v) + 2(q.v)q, written as v + w*t + q x t with t = 2(q x v).
+    ML_INLINE float3     operator*(const float3& v) const {
+        const float3 t = 2.F * cross(xyz, v);
+        return v + w * t + cross(xyz, t);
+    }
+    
+    ML_INLINE float3     GetRotation() const {
+        const float angle = 2.F * acos(w); 
+        return xyz * angle / sin(angle * 0.5F);
+    }
+    
+};
+
+ML_INLINE Quaternion operator*(float a, const Quaternion& q) {
+    return q * a;
+}
+
+ML_INLINE Quaternion operator/(float a, const Quaternion& q) {
+    return a * q.Inverse();
+}
+
+ML_INLINE Quaternion normalize(const Quaternion& q) {
+    return v4f_normalize(q.xmm);
+}
+
+ML_INLINE float      length(const Quaternion& q) {
+    return length(q.q);
+}
+
+ML_INLINE Quaternion Slerp(const Quaternion& a, const Quaternion& b, float x) {
+    if (x <= 0.F) { return a; }
+    if (x >= 1.F) { return b; }
+
+    // Take the short way.
+    float          cosom = dot(a, b);
+    const Quaternion to  = cosom < 0.F ? -b : b;
+    cosom                = cosom < 0.F ? -cosom : cosom;
+
+    float scale0, scale1;
+    if (1.F - cosom > 1e-6F) {
+        const float omega = acos(cosom);
+        const float sinom = 1.F / sin(omega);
+        scale0 = sin((1.F - x) * omega) * sinom;
+        scale1 = sin(      x  * omega) * sinom;
+    } else {
+        // Nearly parallel.
+        scale0 = 1.F - x;
+        scale1 = x;
+    }
+    return Quaternion(scale0 * a.q + scale1 * to.q);
+}
+
+// Nlerp, same path as Slerp but not constant velocity.
+ML_INLINE Quaternion lerp(const Quaternion& a, const Quaternion& b, float x) {
+    if (x <= 0.F) { return a; }
+    if (x >= 1.F) { return b; }
+
+    const float cosom  = dot(a, b);
+    const float scale0 = 1.F - x;
+    const float scale1 = (cosom >= 0.F) ? x : -x;
+    return Quaternion(v4f_normalize((scale0 * a.q + scale1 * b.q).xmm));
+}
+
+// vector4 spherical lerp.
 ML_INLINE float4 Slerp(const float4& a, const float4& b, float x) {
     ML_Assert(x >= 0.0f && x <= 1.0f);
     ML_Assert(abs(dot(a, a) - 1.0f) < 1e-5f);
@@ -845,10 +1023,7 @@ ML_INLINE float4 Slerp(const float4& a, const float4& b, float x) {
 
         r = a * wa + b * wb;
     }
-
-    r *= rsqrt(dot(r, r));
-
-    return r;
+    return normalize(r);
 }
 
 //======================================================================================================================
@@ -1317,6 +1492,10 @@ public:
         ca[2] = float4(xz2 + wy2, yz2 - wx2, 1.0f - (xx2 + yy2), 0.0f).xmm;
         ca[3] = c_v4f_0001;
     }
+    
+    ML_INLINE void SetupByQuaternion(const Quaternion& q) {
+        SetupByQuaternion(q.q);
+    }
 
     ML_INLINE void SetupByRotationX(float angleX) {
         float ct = cos(angleX);
@@ -1668,6 +1847,12 @@ public:
         // Do not check a22 to allow reverse infinite projections
 
         return ((a00 != 0.0f && a10 == 0.0f && a20 == 0.0f && a30 == 0.0f) && (a01 == 0.0f && a11 != 0.0f && a21 == 0.0f && a31 == 0.0f) && (a32 == 1.0f || a32 == -1.0f) && (a03 == 0.0f && a13 == 0.0f && a23 != 0.0f && a33 == 0.0f));
+    }
+    
+    ML_INLINE void SetupByTQS(const float3& t, const Quaternion& q, const float3& s) {
+        SetupByQuaternion(q);
+        AddScale(s);
+        SetTranslation(t);
     }
 };
 

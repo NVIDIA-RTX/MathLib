@@ -850,7 +850,7 @@ union Quaternion {
     : xmm(_mm_setzero_ps()) {
     }
 
-    ML_INLINE Quaternion(float c) // set only scalar part.
+    explicit ML_INLINE Quaternion(float c) // set only scalar part.
         : Quaternion() {
         w = c;
     }
@@ -940,7 +940,7 @@ union Quaternion {
 
     // Rodrigues rotation, only works when *this is a unit quaternion.
     ML_INLINE float3     operator*(const float3& v) const {
-        float3 t = 2.F * cross(xyz, v);
+        const float3 t = 2.F * cross(xyz, v);
         return v + w * t + cross(xyz, t);
     }
     

@@ -28,7 +28,7 @@ public:
         : x(c), y(c) {
     }
 
-    constexpr ML_INLINE float2(float _x, float _y)
+    ML_INLINE float2(float _x, float _y)
         : x(_x), y(_y) {
     }
 
@@ -939,9 +939,8 @@ union Quaternion {
     }
 
     // Rodrigues rotation, only works when *this is a unit quaternion.
-    // v + 2w(q x v) + 2(q.v)q, written as v + w*t + q x t with t = 2(q x v).
     ML_INLINE float3     operator*(const float3& v) const {
-        const float3 t = 2.F * cross(xyz, v);
+        float3 t = 2.F * cross(xyz, v);
         return v + w * t + cross(xyz, t);
     }
     
@@ -968,28 +967,6 @@ ML_INLINE float      length(const Quaternion& q) {
     return length(q.q);
 }
 
-ML_INLINE Quaternion Slerp(const Quaternion& a, const Quaternion& b, float x) {
-    if (x <= 0.F) { return a; }
-    if (x >= 1.F) { return b; }
-
-    // Take the short way.
-    float          cosom = dot(a, b);
-    const Quaternion to  = cosom < 0.F ? -b : b;
-    cosom                = cosom < 0.F ? -cosom : cosom;
-
-    float scale0, scale1;
-    if (1.F - cosom > 1e-6F) {
-        const float omega = acos(cosom);
-        const float sinom = 1.F / sin(omega);
-        scale0 = sin((1.F - x) * omega) * sinom;
-        scale1 = sin(      x  * omega) * sinom;
-    } else {
-        // Nearly parallel.
-        scale0 = 1.F - x;
-        scale1 = x;
-    }
-    return Quaternion(scale0 * a.q + scale1 * to.q);
-}
 
 // Nlerp, same path as Slerp but not constant velocity.
 ML_INLINE Quaternion lerp(const Quaternion& a, const Quaternion& b, float x) {
@@ -1000,6 +977,23 @@ ML_INLINE Quaternion lerp(const Quaternion& a, const Quaternion& b, float x) {
     const float scale0 = 1.F - x;
     const float scale1 = (cosom >= 0.F) ? x : -x;
     return Quaternion(v4f_normalize((scale0 * a.q + scale1 * b.q).xmm));
+}
+
+ML_INLINE Quaternion Slerp(const Quaternion& a, const Quaternion& b, float x) {
+    if (x <= 0.F) { return a; }
+    if (x >= 1.F) { return b; }
+
+    // Take the short way.
+    const float      dpr    = dot(a, b);
+    const Quaternion to     = dpr < 0.F ? -b : b;
+    const float      cosom  = abs(dpr);
+
+    if (1.F - dpr > 1e-6F) {
+        const float  omega  = acos(cosom);
+        const float3 scales = sin(omega * float3(1.F - x, x, 1.F));
+        return v4f_normalize(((scales.x * a + scales.y * b) / scales.z).xmm);
+    }
+    return lerp(a, to, x); 
 }
 
 // vector4 spherical lerp.

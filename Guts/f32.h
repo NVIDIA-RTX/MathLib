@@ -1007,14 +1007,18 @@ ML_INLINE Quatf Slerp(const Quatf& a, const Quatf& b, float x) {
         return v4f_normalize((scales.x * a.q + scales.y * to.q).xmm);
     }
 
-    return lerp(a, to, x);
+    return v4f_normalize(((1.0f - x) * a.q + x * to.q).xmm);
 }
 
-// vector4 spherical lerp.
+// Vector4 spherical interpolation of unit vectors, with x clamped to [0, 1]
 ML_INLINE float4 Slerp(const float4& a, const float4& b, float x) {
-    ML_Assert(x >= 0.0f && x <= 1.0f);
     ML_Assert(abs(dot(a, a) - 1.0f) < 1e-5f);
     ML_Assert(abs(dot(b, b) - 1.0f) < 1e-5f);
+
+    if (x <= 0.0f)
+        return a;
+    if (x >= 1.0f)
+        return b;
 
     float4 r;
 
@@ -1024,12 +1028,8 @@ ML_INLINE float4 Slerp(const float4& a, const float4& b, float x) {
     else {
         theta = acos(theta);
 
-        float3 s = sin(theta * float3(1.0f, 1.0f - x, x));
-        float sn = 1.0f / s.x;
-        float wa = s.y * sn;
-        float wb = s.z * sn;
-
-        r = a * wa + b * wb;
+        float3 s = sin(theta * float3(1.0f - x, x, 0.0f));
+        r = a * s.x + b * s.y;
     }
     return normalize(r);
 }
@@ -1604,7 +1604,7 @@ public:
 
         float3 w = cross(z, d);
         float c = dot(z, d);
-        float k = (1.0f - c) / (1.0f - c * c);
+        float k = 1.0f / (1.0f + c);
 
         float hxy = w.x * w.y * k;
         float hxz = w.x * w.z * k;

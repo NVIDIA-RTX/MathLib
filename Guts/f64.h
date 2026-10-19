@@ -1000,36 +1000,36 @@ ML_INLINE Quatd Slerp(const Quatd& a, const Quatd& b, double x) {
     const Quatd to = d < 0.0 ? -b : b;
     const double cosAngle = abs(d);
 
-    if (cosAngle < 0.999999999999) {
+    if (cosAngle < 0.99999999) {
         const double angle = acos(cosAngle);
         const double2 scales = sin(angle * double2(1.0 - x, x));
 
         return v4d_normalize((scales.x * a.q + scales.y * to.q).ymm);
     }
 
-    return lerp(a, to, x);
+    return v4d_normalize(((1.0 - x) * a.q + x * to.q).ymm);
 }
 
-// vector4 spherical lerp.
+// Vector4 spherical interpolation of unit vectors, with x clamped to [0, 1]
 ML_INLINE double4 Slerp(const double4& a, const double4& b, double x) {
-    ML_Assert(x >= 0.0 && x <= 1.0);
     ML_Assert(abs(dot(a, a) - 1.0) < 1e-5);
     ML_Assert(abs(dot(b, b) - 1.0) < 1e-5);
+
+    if (x <= 0.0)
+        return a;
+    if (x >= 1.0)
+        return b;
 
     double4 r;
 
     double theta = dot(a, b);
-    if (theta > 0.9995)
+    if (theta > 0.99999999)
         r = lerp(a, b, x);
     else {
         theta = acos(theta);
 
-        double3 s = sin(theta * double3(1.0, 1.0 - x, x));
-        double sn = 1.0 / s.x;
-        double wa = s.y * sn;
-        double wb = s.z * sn;
-
-        r = a * wa + b * wb;
+        double3 s = sin(theta * double3(1.0 - x, x, 0.0));
+        r = a * s.x + b * s.y;
     }
 
     r *= rsqrt(dot(r, r));
@@ -1607,7 +1607,7 @@ public:
 
         double3 w = cross(z, d);
         double c = dot(z, d);
-        double k = (1.0 - c) / (1.0 - c * c);
+        double k = 1.0 / (1.0 + c);
 
         double hxy = w.x * w.y * k;
         double hxz = w.x * w.z * k;

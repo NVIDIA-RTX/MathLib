@@ -445,9 +445,13 @@ ML_INLINE v4f v4f_rcp(const v4f& r) {
 
 ML_INLINE v4f v4f_mod(const v4f& x, const v4f& y) {
     v4f d = _mm_div_ps(x, y);
+#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_SSE4)
+    v4f f = _mm_round_ps(d, _MM_FROUND_TO_ZERO | ML_ROUNDING_EXEPTIONS_MASK);
+#else
     v4f f = v4f_floor(d);
     v4f c = v4f_ceil(d);
     f = _mm_blendv_ps(c, f, _mm_cmpgt_ps(d, _mm_setzero_ps()));
+#endif
 
     return _mm_fnmadd_ps(y, f, x);
 }
@@ -673,27 +677,18 @@ ML_INLINE v4d v4d_rsqrt(const v4d& r) {
 }
 
 ML_INLINE v4d v4d_rcp(const v4d& r) {
-    v4d c = _mm256_div_pd(c_v4d_1111, r);
-
-#if ML_NEWTONRAPHSON_APROXIMATION
-
-    v4d a = _mm256_mul_pd(c, r);
-    v4d b = _mm256_add_pd(c, c);
-
-    return _mm256_fnmadd_pd(a, c, b);
-
-#else
-
-    return c;
-
-#endif
+    return _mm256_div_pd(c_v4d_1111, r);
 }
 
 ML_INLINE v4d v4d_mod(const v4d& x, const v4d& y) {
     v4d d = _mm256_div_pd(x, y);
+#if (ML_INTRINSIC_LEVEL >= ML_INTRINSIC_SSE4)
+    v4d f = _mm256_round_pd(d, _MM_FROUND_TO_ZERO | ML_ROUNDING_EXEPTIONS_MASK);
+#else
     v4d f = v4d_floor(d);
     v4d c = v4d_ceil(d);
     f = _mm256_blendv_pd(c, f, _mm256_cmpgt_pd(d, _mm256_setzero_pd()));
+#endif
 
     return _mm256_fnmadd_pd(y, f, x);
 }

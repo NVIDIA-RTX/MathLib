@@ -237,13 +237,106 @@ void ML_Tests() {
     { // Double-precision interpolation near the linear fallback threshold
         const Quatd identity(1.0);
         const double3 axis = normalize(double3(1.0 + 1e-10, 2.0 - 1e-10, -3.0 + 1e-9));
-        const double angles[] = {0.02, 1e-5, 1e-8};
+        const double angles[] = {0.02, 0.00028, 0.00029, 1e-5, 1e-8};
 
-        for (uint32_t i = 0; i < 3; i++) {
+        for (uint32_t i = 0; i < 5; i++) {
             const Quatd end(angles[i], axis);
             const Quatd midpoint = Slerp(identity, -end, 0.25);
             const double3 expected = axis * (angles[i] * 0.25);
             ML_Assert(all(abs(midpoint.GetRotation() - expected) < double3(quatdEps)));
+        }
+    }
+
+    { // float rotation between parallel and nearly parallel directions
+        const float3 from(0.0f, 0.0f, 1.0f);
+        const float angles[] = {0.0f, 1e-4f, 0.8f, 2.8f};
+        for (uint32_t i = 0; i < 4; i++) {
+            const float3 to(sin(angles[i]), 0.0f, cos(angles[i]));
+            float4x4 rotation;
+            rotation.SetupByRotation(from, to);
+            ML_Assert(abs(rotation.a00 - to.z) < Test_Eps);
+            ML_Assert(abs(rotation.a11 - 1.0f) < Test_Eps);
+            ML_Assert(abs(rotation.a22 - to.z) < Test_Eps);
+            ML_Assert(abs(rotation.a02 - to.x) < Test_Eps);
+            ML_Assert(abs(rotation.a20 + to.x) < Test_Eps);
+        }
+    }
+
+    { // float vector Slerp follows a great circle, including near-antipodal directions
+        const float4 from(1.0f, 0.0f, 0.0f, 0.0f);
+        const float4 to(0.0f, 1.0f, 0.0f, 0.0f);
+        ML_Assert(all(Slerp(from, to, -1.0f) == from));
+        ML_Assert(all(Slerp(from, to, 1.0f + 1.0f) == to));
+        ML_Assert(all(Slerp(from, to, 0.0f) == from));
+        ML_Assert(all(Slerp(from, to, 1.0f) == to));
+        ML_Assert(all(abs(Slerp(from, -from, 0.0f) - from) < float4(Test_Eps)));
+        ML_Assert(all(abs(Slerp(from, -from, 1.0f) + from) < float4(Test_Eps)));
+        const float angles[] = {0.0f, 0.05f, 0.8f, 2.8f, 3.13f};
+        for (uint32_t i = 0; i < 5; i++) {
+            const float4 to(cos(angles[i]), sin(angles[i]), 0.0f, 0.0f);
+            for (uint32_t j = 0; j <= 4; j++) {
+                const float t = float(j) / 4.0f;
+                const float4 expected(cos(angles[i] * t), sin(angles[i] * t), 0.0f, 0.0f);
+                // Near-antipodal interpolation amplifies rounding in the input dot product.
+                const float eps = i == 4 ? 1e-4f : float(Test_Eps);
+                ML_Assert(all(abs(Slerp(from, to, t) - expected) < float4(eps)));
+            }
+        }
+    }
+
+    { // float remainder truncates positive and negative quotients toward zero
+        const float4 x(5.5f, -5.5f, 4.0f, -0.25f);
+        const float4 y(2.0f, 2.0f, -2.0f, -2.0f);
+        ML_Assert(all(fmod(x, y) == float4(1.5f, -1.5f, 0.0f, -0.25f)));
+    }
+
+    { // double rotation between parallel and nearly parallel directions
+        const double3 from(0.0, 0.0, 1.0);
+        const double angles[] = {0.0, 1e-4, 0.8, 2.8};
+        for (uint32_t i = 0; i < 4; i++) {
+            const double3 to(sin(angles[i]), 0.0, cos(angles[i]));
+            double4x4 rotation;
+            rotation.SetupByRotation(from, to);
+            ML_Assert(abs(rotation.a00 - to.z) < 1e-12);
+            ML_Assert(abs(rotation.a11 - 1.0) < 1e-12);
+            ML_Assert(abs(rotation.a22 - to.z) < 1e-12);
+            ML_Assert(abs(rotation.a02 - to.x) < 1e-12);
+            ML_Assert(abs(rotation.a20 + to.x) < 1e-12);
+        }
+    }
+
+    { // double vector Slerp follows a great circle, including near-antipodal directions
+        const double4 from(1.0, 0.0, 0.0, 0.0);
+        const double4 to(0.0, 1.0, 0.0, 0.0);
+        ML_Assert(all(Slerp(from, to, -1.0) == from));
+        ML_Assert(all(Slerp(from, to, 1.0 + 1.0) == to));
+        ML_Assert(all(Slerp(from, to, 0.0) == from));
+        ML_Assert(all(Slerp(from, to, 1.0) == to));
+        ML_Assert(all(abs(Slerp(from, -from, 0.0) - from) < double4(1e-12)));
+        ML_Assert(all(abs(Slerp(from, -from, 1.0) + from) < double4(1e-12)));
+        const double angles[] = {0.0, 0.00014, 0.00015, 0.05, 0.8, 2.8, 3.13};
+        for (uint32_t i = 0; i < 7; i++) {
+            const double4 to(cos(angles[i]), sin(angles[i]), 0.0, 0.0);
+            for (uint32_t j = 0; j <= 4; j++) {
+                const double t = double(j) / 4.0;
+                const double4 expected(cos(angles[i] * t), sin(angles[i] * t), 0.0, 0.0);
+                ML_Assert(all(abs(Slerp(from, to, t) - expected) < double4(1e-12)));
+            }
+        }
+    }
+
+    { // double remainder truncates positive and negative quotients toward zero
+        const double4 x(5.5, -5.5, 4.0, -0.25);
+        const double4 y(2.0, 2.0, -2.0, -2.0);
+        ML_Assert(all(fmod(x, y) == double4(1.5, -1.5, 0.0, -0.25)));
+    }
+
+    { // Full-precision reciprocal preserves zero/infinity and avoids intermediate overflow
+        const double infinity = double4(c_v4d_Inf).x;
+        const double inputs[] = {0.0, -0.0, infinity, -infinity, 1e-308, -1e-308, 3.0, -7.0};
+        for (uint32_t i = 0; i < 8; i++) {
+            const double4 result(v4d_rcp(double4(inputs[i]).ymm));
+            ML_Assert(all(result == double4(1.0 / inputs[i])));
         }
     }
 

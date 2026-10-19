@@ -8,10 +8,7 @@
 
 union double2 {
     v2d xmm;
-
-    struct {
-        double a[COORD_2D];
-    };
+    double a[COORD_2D];
 
     struct {
         double x, y;
@@ -248,10 +245,7 @@ ML_INLINE double2 Rotate(const double2& v, double angle) {
 
 union double3 {
     v4d ymm;
-
-    struct {
-        double a[COORD_3D];
-    };
+    double a[COORD_3D];
 
     struct {
         double x, y, z;
@@ -563,10 +557,7 @@ ML_INLINE bool IsPointsNear(const double3& p1, const double3& p2, double eps) {
 
 union double4 {
     v4d ymm;
-
-    struct {
-        double a[COORD_4D];
-    };
+    double a[COORD_4D];
 
     struct {
         double x, y, z, w;
@@ -603,8 +594,8 @@ public:
         : ymm(v) {
     }
 
-    ML_INLINE double4(const double* v4)
-        : ymm(_mm256_loadu_pd(v4)) {
+    ML_INLINE double4(const double* v4d)
+        : ymm(_mm256_loadu_pd(v4d)) {
     }
 
     ML_INLINE double4(const double4& v) = default;
@@ -824,7 +815,202 @@ ML_INLINE double4 SinCos(const double4& x, double4* pCos) {
     return _mm256_sincos_pd(&pCos->ymm, x.ymm);
 }
 
-// TODO: add "Quaternion"
+//======================================================================================================================
+// Quatd
+//======================================================================================================================
+
+union Quatd {
+    v4d ymm;
+    double4 q;
+    double a[COORD_4D];
+
+    struct {
+        double x, y, z, w;
+    };
+
+    ML_SWIZZLE_4(v4d_swizzle2, double2, v4d_swizzle3, double3, v4d_swizzle4, double4);
+
+    // Zero quaternion
+    ML_INLINE Quatd()
+        : ymm(_mm256_setzero_pd()) {
+    }
+
+    // Real quaternion
+    explicit ML_INLINE Quatd(double c)
+        : ymm(v4d_set000w(c)) {
+    }
+
+    // Pure imaginary quaternion
+    explicit ML_INLINE Quatd(const double3& v)
+        : ymm(v4d_setw0(v.ymm)) {
+    }
+
+    explicit ML_INLINE Quatd(const double4& v)
+        : ymm(v.ymm) {
+    }
+
+    ML_INLINE Quatd(double x, double y, double z, double w)
+        : ymm(v4d_set(x, y, z, w)) {
+    }
+
+    ML_INLINE Quatd(const double3& v, double w)
+        : ymm(v4d_set(v.x, v.y, v.z, w)) {
+    }
+
+    // Angle-axis constructor (axis must be unit length)
+    ML_INLINE Quatd(double angle, const double3& axis)
+        : Quatd(axis * sin(angle * 0.5), cos(angle * 0.5)) {
+    }
+
+    ML_INLINE Quatd(const v4d& v)
+        : ymm(v) {
+    }
+
+    ML_INLINE Quatd(const double* v)
+        : ymm(_mm256_loadu_pd(v)) {
+    }
+
+    ML_INLINE Quatd(const Quatd& v) = default;
+
+    ML_INLINE void operator=(const Quatd& v) {
+        ymm = v.ymm;
+    }
+
+    ML_INLINE operator double4() const {
+        return q;
+    }
+
+    ML_COMPARE(bool4, Quatd, <, _mm256_cmplt_pd, _mm256_movemask_pd, ymm)
+    ML_COMPARE(bool4, Quatd, <=, _mm256_cmple_pd, _mm256_movemask_pd, ymm)
+    ML_COMPARE(bool4, Quatd, ==, _mm256_cmpeq_pd, _mm256_movemask_pd, ymm)
+    ML_COMPARE(bool4, Quatd, >, _mm256_cmpgt_pd, _mm256_movemask_pd, ymm)
+    ML_COMPARE(bool4, Quatd, >=, _mm256_cmpge_pd, _mm256_movemask_pd, ymm)
+    ML_COMPARE(bool4, Quatd, !=, _mm256_cmpneq_pd, _mm256_movemask_pd, ymm)
+
+    ML_OP(Quatd, double, -, -=, _mm256_sub_pd, v4d_set000w, ymm)
+    ML_OP(Quatd, double, +, +=, _mm256_add_pd, v4d_set000w, ymm)
+
+    ML_INLINE Quatd operator-() const {
+        return v4d_negate(ymm);
+    }
+
+    ML_INLINE Quatd Conjugate() const {
+        return v4d_negate3(ymm);
+    }
+
+    // Squared magnitude
+    ML_INLINE double Norm() const {
+        return dot(q, q);
+    }
+
+    // Requires a nonzero quaternion
+    ML_INLINE Quatd Inverse() const {
+        return Conjugate() / Norm();
+    }
+
+    ML_INLINE Quatd operator*(const Quatd& v) const {
+        return Quatd(w * v.xyz + xyz * v.w + cross(xyz, v.xyz), dot(q, v.Conjugate().q));
+    }
+
+    ML_INLINE Quatd operator/(const Quatd& v) const {
+        return Quatd(xyz * v.w - w * v.xyz - cross(xyz, v.xyz), dot(q, v.q)) / v.Norm();
+    }
+
+    ML_INLINE Quatd operator*(double c) const {
+        return Quatd(q * c);
+    }
+
+    ML_INLINE Quatd operator/(double c) const {
+        return Quatd(q / c);
+    }
+
+    ML_INLINE void operator*=(const Quatd& v) {
+        *this = *this * v;
+    }
+
+    ML_INLINE void operator/=(const Quatd& v) {
+        *this = *this / v;
+    }
+
+    ML_INLINE void operator*=(double c) {
+        q *= c;
+    }
+
+    ML_INLINE void operator/=(double c) {
+        q /= c;
+    }
+
+    // Rotate a vector (requires a unit quaternion)
+    ML_INLINE double3 operator*(const double3& v) const {
+        const double3 t = 2.0 * cross(xyz, v);
+
+        return v + w * t + cross(xyz, t);
+    }
+
+    // Rotation vector (axis * angle) for a unit quaternion, stable at identity and for small angles
+    ML_INLINE double3 GetRotation() const {
+        const double3 v = xyz;
+        const double sinHalfAngle = length(v);
+
+        if (sinHalfAngle == 0.0)
+            return double3(0.0);
+
+        const double angle = 2.0 * atan2(sinHalfAngle, w);
+
+        return v * (angle / sinHalfAngle);
+    }
+};
+
+ML_INLINE Quatd operator*(double c, const Quatd& q) {
+    return q * c;
+}
+
+ML_INLINE Quatd operator/(double c, const Quatd& q) {
+    return c * q.Inverse();
+}
+
+ML_INLINE Quatd normalize(const Quatd& q) {
+    return v4d_normalize(q.ymm);
+}
+
+ML_INLINE double length(const Quatd& q) {
+    return length(q.q);
+}
+
+// Shortest-path normalized interpolation of unit quaternions, with x clamped to [0, 1]
+ML_INLINE Quatd lerp(const Quatd& a, const Quatd& b, double x) {
+    if (x <= 0.0)
+        return a;
+    if (x >= 1.0)
+        return b;
+
+    const double scale1 = dot(a.q, b.q) >= 0.0 ? x : -x;
+
+    return v4d_normalize(((1.0 - x) * a.q + scale1 * b.q).ymm);
+}
+
+// Shortest-path spherical interpolation of unit quaternions, with x clamped to [0, 1]
+ML_INLINE Quatd Slerp(const Quatd& a, const Quatd& b, double x) {
+    if (x <= 0.0)
+        return a;
+    if (x >= 1.0)
+        return b;
+
+    const double d = dot(a.q, b.q);
+    const Quatd to = d < 0.0 ? -b : b;
+    const double cosAngle = abs(d);
+
+    if (cosAngle < 0.999999999999) {
+        const double angle = acos(cosAngle);
+        const double2 scales = sin(angle * double2(1.0 - x, x));
+
+        return v4d_normalize((scales.x * a.q + scales.y * to.q).ymm);
+    }
+
+    return lerp(a, to, x);
+}
+
+// vector4 spherical lerp.
 ML_INLINE double4 Slerp(const double4& a, const double4& b, double x) {
     ML_Assert(x >= 0.0 && x <= 1.0);
     ML_Assert(abs(dot(a, a) - 1.0) < 1e-5);
@@ -858,27 +1044,9 @@ ML_INLINE double4 Slerp(const double4& a, const double4& b, double x) {
 // IMPORTANT: store - "column-major", math - "row-major" (vector is column)
 union double4x4 {
     // Column array
-    struct {
-        double4 ca[4];
-
-        /*
-        TODO: at least older GCC version don't allow this:
-
-        float4 c0;
-        float4 c1;
-        float4 c2;
-        float4 c3;
-
-        because of this errors:
-         - member with constructor not allowed in anonymous aggregate
-         - member with copy assignment operator not allowed in anonymous aggregate
-        */
-    };
-
+    double4 ca[4];
     // Element array
-    struct {
-        double a[16];
-    };
+    double a[16];
 
     // Elements aXY, where X - row, Y - column
     struct {
@@ -1668,6 +1836,15 @@ public:
         // Do not check a22 to allow reverse infinite projections
 
         return ((a00 != 0.0 && a10 == 0.0 && a20 == 0.0 && a30 == 0.0) && (a01 == 0.0 && a11 != 0.0 && a21 == 0.0 && a31 == 0.0) && (a32 == 1.0 || a32 == -1.0) && (a03 == 0.0 && a13 == 0.0 && a23 != 0.0 && a33 == 0.0));
+    }
+
+    // Local scale, rotation, then translation (requires a unit quaternion)
+    ML_INLINE void SetupByTQS(const double3& t, const Quatd& q, const double3& s) {
+        SetupByQuaternion(q);
+        ca[0] = _mm256_mul_pd(ca[0], _mm256_set1_pd(s.x));
+        ca[1] = _mm256_mul_pd(ca[1], _mm256_set1_pd(s.y));
+        ca[2] = _mm256_mul_pd(ca[2], _mm256_set1_pd(s.z));
+        SetTranslation(t);
     }
 };
 

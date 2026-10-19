@@ -270,11 +270,13 @@ union uint4;
 union float2;
 union float3;
 union float4;
+union Quatf;
 union float4x4;
 
 union double2;
 union double3;
 union double4;
+union Quatd;
 union double4x4;
 
 //======================================================================================================================
@@ -654,9 +656,7 @@ template <class T>
 class ctRect {
 public:
     union {
-        struct {
-            T vMin[COORD_2D];
-        };
+        T vMin[COORD_2D];
 
         struct {
             T minx;
@@ -665,9 +665,7 @@ public:
     };
 
     union {
-        struct {
-            T vMax[COORD_2D];
-        };
+        T vMax[COORD_2D];
 
         struct {
             T maxx;

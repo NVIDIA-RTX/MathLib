@@ -67,13 +67,8 @@ template <class C, uint32_t X, uint32_t Y>
 class v4i_swizzle2 {
 private:
     union {
-        struct {
-            v4i vec;
-        };
-
-        struct {
-            int32_t a[COORD_4D];
-        };
+        v4i vec;
+        int32_t a[COORD_4D];
     };
 
 public:
@@ -100,13 +95,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z>
 class v4i_swizzle3 {
 private:
     union {
-        struct {
-            v4i vec;
-        };
-
-        struct {
-            int32_t a[COORD_4D];
-        };
+        v4i vec;
+        int32_t a[COORD_4D];
     };
 
 public:
@@ -133,13 +123,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z, uint32_t W>
 class v4i_swizzle4 {
 private:
     union {
-        struct {
-            v4i vec;
-        };
-
-        struct {
-            int32_t a[COORD_4D];
-        };
+        v4i vec;
+        int32_t a[COORD_4D];
     };
 
 public:
@@ -168,13 +153,8 @@ template <class C, uint32_t X, uint32_t Y>
 class v4u_swizzle2 {
 private:
     union {
-        struct {
-            v4i vec;
-        };
-
-        struct {
-            uint32_t a[COORD_4D];
-        };
+        v4i vec;
+        uint32_t a[COORD_4D];
     };
 
 public:
@@ -201,13 +181,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z>
 class v4u_swizzle3 {
 private:
     union {
-        struct {
-            v4i vec;
-        };
-
-        struct {
-            uint32_t a[COORD_4D];
-        };
+        v4i vec;
+        uint32_t a[COORD_4D];
     };
 
 public:
@@ -234,13 +209,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z, uint32_t W>
 class v4u_swizzle4 {
 private:
     union {
-        struct {
-            v4i vec;
-        };
-
-        struct {
-            uint32_t a[COORD_4D];
-        };
+        v4i vec;
+        uint32_t a[COORD_4D];
     };
 
 public:
@@ -269,13 +239,8 @@ template <class C, uint32_t X, uint32_t Y>
 class v4f_swizzle2 {
 private:
     union {
-        struct {
-            v4f vec;
-        };
-
-        struct {
-            float a[COORD_4D];
-        };
+        v4f vec;
+        float a[COORD_4D];
     };
 
 public:
@@ -296,13 +261,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z>
 class v4f_swizzle3 {
 private:
     union {
-        struct {
-            v4f vec;
-        };
-
-        struct {
-            float a[COORD_4D];
-        };
+        v4f vec;
+        float a[COORD_4D];
     };
 
 public:
@@ -323,13 +283,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z, uint32_t W>
 class v4f_swizzle4 {
 private:
     union {
-        struct {
-            v4f vec;
-        };
-
-        struct {
-            float a[COORD_4D];
-        };
+        v4f vec;
+        float a[COORD_4D];
     };
 
 public:
@@ -352,13 +307,8 @@ template <class C, uint32_t X, uint32_t Y>
 class v4d_swizzle2 {
 private:
     union {
-        struct {
-            v4d vec;
-        };
-
-        struct {
-            double a[COORD_4D];
-        };
+        v4d vec;
+        double a[COORD_4D];
     };
 
 public:
@@ -379,13 +329,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z>
 class v4d_swizzle3 {
 private:
     union {
-        struct {
-            v4d vec;
-        };
-
-        struct {
-            double a[COORD_4D];
-        };
+        v4d vec;
+        double a[COORD_4D];
     };
 
 public:
@@ -406,13 +351,8 @@ template <class C, uint32_t X, uint32_t Y, uint32_t Z, uint32_t W>
 class v4d_swizzle4 {
 private:
     union {
-        struct {
-            v4d vec;
-        };
-
-        struct {
-            double a[COORD_4D];
-        };
+        v4d vec;
+        double a[COORD_4D];
     };
 
 public:

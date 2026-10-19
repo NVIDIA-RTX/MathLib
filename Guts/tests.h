@@ -54,6 +54,199 @@ namespace ml {
 #endif
 
 void ML_Tests() {
+    { // Quatf arithmetic and construction
+        const Quatf identity(1.0f);
+        const Quatf a(1.0f, 2.0f, 3.0f, 4.0f);
+        const Quatf b(-2.0f, 1.0f, 0.5f, 3.0f);
+        ML_Assert(all(Quatf(float3(1.0f)) == Quatf(1.0f, 1.0f, 1.0f, 0.0f)));
+        ML_Assert(all(Quatf(float3(1.0f, 1.0f, 1.0f)) == Quatf(float3(1.0f))));
+        ML_Assert(all((a + 2.0f) == (a + Quatf(2.0f))));
+        ML_Assert(all((2.0f + a) == (Quatf(2.0f) + a)));
+        ML_Assert(all((a - 2.0f) == (a - Quatf(2.0f))));
+        ML_Assert(all((2.0f - a) == (Quatf(2.0f) - a)));
+        ML_Assert(abs(a.Norm() - 30.0f) < Test_Eps);
+        ML_Assert(all(abs((a * a.Inverse()).q - identity.q) < float4(Test_Eps)));
+        ML_Assert(all(abs((a / b).q - (a * b.Inverse()).q) < float4(Test_Eps)));
+        ML_Assert(all(abs((2.0f / a).q - (Quatf(2.0f) / a).q) < float4(Test_Eps)));
+
+        Quatf c = a;
+        c += 2.0f;
+        ML_Assert(all(c == (a + 2.0f)));
+        c -= 2.0f;
+        ML_Assert(all(c == a));
+        c *= b;
+        ML_Assert(all(abs(c.q - (a * b).q) < float4(Test_Eps)));
+        c /= b;
+        ML_Assert(all(abs(c.q - a.q) < float4(Test_Eps)));
+        c = a;
+        c *= c;
+        ML_Assert(all(abs(c.q - (a * a).q) < float4(Test_Eps)));
+        c = a;
+        c /= c;
+        ML_Assert(all(abs(c.q - identity.q) < float4(Test_Eps)));
+        c = a;
+        c *= 2.0f;
+        c /= 2.0f;
+        ML_Assert(all(c == a));
+    }
+
+    { // Quatf interpolation and rotation-vector limits
+        const Quatf identity(1.0f);
+        const Quatf quarterTurn(1.5707963267948966f, float3(0.0f, 0.0f, 1.0f));
+        const float3 v(1.0f, 0.0f, 0.0f);
+        ML_Assert(all(identity.GetRotation() == float3(0.0f)));
+        ML_Assert(all((-identity).GetRotation() == float3(0.0f)));
+        ML_Assert(all(abs(quarterTurn.GetRotation() - float3(0.0f, 0.0f, 1.5707963267948966f)) < float3(Test_Eps)));
+        const Quatf tiny(1e-8f, float3(0.0f, 1.0f, 0.0f));
+        ML_Assert(abs(tiny.GetRotation().y - 1e-8f) < 1e-12f);
+
+        for (uint32_t i = 0; i <= 16; i++) {
+            const float t = float(i) / 16.0f;
+            const float3 expected = Quatf(t * 1.5707963267948966f, float3(0.0f, 0.0f, 1.0f)) * v;
+            ML_Assert(all(abs(Slerp(identity, quarterTurn, t) * v - expected) < float3(Test_Eps)));
+            ML_Assert(all(abs(Slerp(identity, -quarterTurn, t) * v - expected) < float3(Test_Eps)));
+            ML_Assert(abs(Slerp(identity, -identity, t).Norm() - 1.0f) < Test_Eps);
+            ML_Assert(abs(lerp(identity, -identity, t).Norm() - 1.0f) < Test_Eps);
+            ML_Assert(all(abs(Slerp(identity, tiny, t).GetRotation() - float3(0.0f, t * 1e-8f, 0.0f)) < float3(1e-12f)));
+        }
+
+        const Quatf slightlyLong = -identity * 1.0000001f;
+        ML_Assert(abs(Slerp(identity, slightlyLong, 0.5f).Norm() - 1.0f) < Test_Eps);
+        ML_Assert(all(Slerp(identity, quarterTurn, -1.0f) == identity));
+        ML_Assert(all(Slerp(identity, quarterTurn, 2.0f) == quarterTurn));
+        ML_Assert(all(lerp(identity, quarterTurn, -1.0f) == identity));
+        ML_Assert(all(lerp(identity, quarterTurn, 2.0f) == quarterTurn));
+    }
+
+    { // Quatf composition and TQS use local scale followed by rotation and translation
+        const Quatf a(0.7f, normalize(float3(1.0f, 2.0f, -3.0f)));
+        const Quatf b(-1.1f, normalize(float3(-2.0f, 1.0f, 3.0f)));
+        const Quatf rotation = a * b;
+        float4x4 identityMatrix;
+        identityMatrix.SetupByQuaternion({0.0f, 0.0f, 0.0f, 1.0f});
+        ML_Assert(all(identityMatrix * float3(1.0f, 2.0f, 3.0f) == float3(1.0f, 2.0f, 3.0f)));
+        float4x4 rotationMatrix;
+        rotationMatrix.SetupByQuaternion(rotation);
+        ML_Assert(all(abs(rotationMatrix * float3(1.0f, 2.0f, 3.0f) - rotation * float3(1.0f, 2.0f, 3.0f)) < float3(Test_Eps)));
+        const float3 translation(10.0f, 20.0f, 30.0f);
+        const float3 scales[] = {float3(2.0f), float3(2.0f, 3.0f, 4.0f), float3(-2.0f, 0.0f, 4.0f)};
+
+        for (uint32_t i = 0; i < 3; i++) {
+            float4x4 matrix;
+            matrix.SetupByTQS(translation, rotation, scales[i]);
+
+            for (uint32_t j = 0; j < 3; j++) {
+                const float3 v(float(j + 1), float(j) - 2.0f, 0.5f - float(j));
+                ML_Assert(all(abs(rotation * v - a * (b * v)) < float3(Test_Eps)));
+                ML_Assert(all(abs(matrix * v - (translation + rotation * (scales[i] * v))) < float3(Test_Eps)));
+            }
+        }
+    }
+
+    const double quatdEps = 1e-12;
+
+    { // Quatd arithmetic and construction
+        const Quatd identity(1.0);
+        const Quatd a(1.0, 2.0, 3.0, 4.0);
+        const Quatd b(-2.0, 1.0, 0.5, 3.0);
+        ML_Assert(all(Quatd(double3(1.0)) == Quatd(1.0, 1.0, 1.0, 0.0)));
+        ML_Assert(all(Quatd(double3(1.0, 1.0, 1.0)) == Quatd(double3(1.0))));
+        ML_Assert(all((a + 2.0) == (a + Quatd(2.0))));
+        ML_Assert(all((2.0 + a) == (Quatd(2.0) + a)));
+        ML_Assert(all((a - 2.0) == (a - Quatd(2.0))));
+        ML_Assert(all((2.0 - a) == (Quatd(2.0) - a)));
+        ML_Assert(abs(a.Norm() - 30.0) < quatdEps);
+        ML_Assert(all(abs((a * a.Inverse()).q - identity.q) < double4(quatdEps)));
+        ML_Assert(all(abs((a / b).q - (a * b.Inverse()).q) < double4(quatdEps)));
+        ML_Assert(all(abs((2.0 / a).q - (Quatd(2.0) / a).q) < double4(quatdEps)));
+
+        Quatd c = a;
+        c += 2.0;
+        ML_Assert(all(c == (a + 2.0)));
+        c -= 2.0;
+        ML_Assert(all(c == a));
+        c *= b;
+        ML_Assert(all(abs(c.q - (a * b).q) < double4(quatdEps)));
+        c /= b;
+        ML_Assert(all(abs(c.q - a.q) < double4(quatdEps)));
+        c = a;
+        c *= c;
+        ML_Assert(all(abs(c.q - (a * a).q) < double4(quatdEps)));
+        c = a;
+        c /= c;
+        ML_Assert(all(abs(c.q - identity.q) < double4(quatdEps)));
+        c = a;
+        c *= 2.0;
+        c /= 2.0;
+        ML_Assert(all(c == a));
+    }
+
+    { // Quatd interpolation and rotation-vector limits
+        const Quatd identity(1.0);
+        const Quatd quarterTurn(1.5707963267948966, double3(0.0, 0.0, 1.0));
+        const double3 v(1.0, 0.0, 0.0);
+        ML_Assert(all(identity.GetRotation() == double3(0.0)));
+        ML_Assert(all((-identity).GetRotation() == double3(0.0)));
+        ML_Assert(all(abs(quarterTurn.GetRotation() - double3(0.0, 0.0, 1.5707963267948966)) < double3(quatdEps)));
+        const Quatd tiny(1e-16, double3(0.0, 1.0, 0.0));
+        ML_Assert(abs(tiny.GetRotation().y - 1e-16) < 1e-28);
+
+        for (uint32_t i = 0; i <= 16; i++) {
+            const double t = double(i) / 16.0;
+            const double3 expected = Quatd(t * 1.5707963267948966, double3(0.0, 0.0, 1.0)) * v;
+            ML_Assert(all(abs(Slerp(identity, quarterTurn, t) * v - expected) < double3(quatdEps)));
+            ML_Assert(all(abs(Slerp(identity, -quarterTurn, t) * v - expected) < double3(quatdEps)));
+            ML_Assert(abs(Slerp(identity, -identity, t).Norm() - 1.0) < quatdEps);
+            ML_Assert(abs(lerp(identity, -identity, t).Norm() - 1.0) < quatdEps);
+            ML_Assert(all(abs(Slerp(identity, tiny, t).GetRotation() - double3(0.0, t * 1e-16, 0.0)) < double3(1e-28)));
+        }
+
+        const Quatd slightlyLong = -identity * 1.0000000000000002;
+        ML_Assert(abs(Slerp(identity, slightlyLong, 0.5).Norm() - 1.0) < quatdEps);
+        ML_Assert(all(Slerp(identity, quarterTurn, -1.0) == identity));
+        ML_Assert(all(Slerp(identity, quarterTurn, 2.0) == quarterTurn));
+        ML_Assert(all(lerp(identity, quarterTurn, -1.0) == identity));
+        ML_Assert(all(lerp(identity, quarterTurn, 2.0) == quarterTurn));
+    }
+
+    { // Quatd composition and TQS use local scale followed by rotation and translation
+        const Quatd a(0.7, normalize(double3(1.0, 2.0, -3.0)));
+        const Quatd b(-1.1, normalize(double3(-2.0, 1.0, 3.0)));
+        const Quatd rotation = a * b;
+        double4x4 identityMatrix;
+        identityMatrix.SetupByQuaternion({0.0, 0.0, 0.0, 1.0});
+        ML_Assert(all(identityMatrix * double3(1.0, 2.0, 3.0) == double3(1.0, 2.0, 3.0)));
+        double4x4 rotationMatrix;
+        rotationMatrix.SetupByQuaternion(rotation);
+        ML_Assert(all(abs(rotationMatrix * double3(1.0, 2.0, 3.0) - rotation * double3(1.0, 2.0, 3.0)) < double3(quatdEps)));
+        const double3 translation(10.0, 20.0, 30.0);
+        const double3 scales[] = {double3(2.0), double3(2.0, 3.0, 4.0), double3(-2.0, 0.0, 4.0)};
+
+        for (uint32_t i = 0; i < 3; i++) {
+            double4x4 matrix;
+            matrix.SetupByTQS(translation, rotation, scales[i]);
+
+            for (uint32_t j = 0; j < 3; j++) {
+                const double3 v(double(j + 1), double(j) - 2.0, 0.5 - double(j));
+                ML_Assert(all(abs(rotation * v - a * (b * v)) < double3(quatdEps)));
+                ML_Assert(all(abs(matrix * v - (translation + rotation * (scales[i] * v))) < double3(quatdEps)));
+            }
+        }
+    }
+
+    { // Double-precision interpolation near the linear fallback threshold
+        const Quatd identity(1.0);
+        const double3 axis = normalize(double3(1.0 + 1e-10, 2.0 - 1e-10, -3.0 + 1e-9));
+        const double angles[] = {0.02, 1e-5, 1e-8};
+
+        for (uint32_t i = 0; i < 3; i++) {
+            const Quatd end(angles[i], axis);
+            const Quatd midpoint = Slerp(identity, -end, 0.25);
+            const double3 expected = axis * (angles[i] * 0.25);
+            ML_Assert(all(abs(midpoint.GetRotation() - expected) < double3(quatdEps)));
+        }
+    }
+
     const uint32_t N = 10000;
     const float R = 10000.0f;
 

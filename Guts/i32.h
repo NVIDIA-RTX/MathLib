@@ -8,10 +8,7 @@
 
 union int2 {
     v2i mm;
-
-    struct {
-        int32_t a[COORD_2D];
-    };
+    int32_t a[COORD_2D];
 
     struct {
         int32_t x, y;
@@ -87,10 +84,7 @@ ML_INLINE int2 max(const int2& x, const int2& y) {
 
 union int3 {
     v4i xmm;
-
-    struct {
-        int32_t a[COORD_3D];
-    };
+    int32_t a[COORD_3D];
 
     struct {
         int32_t x, y, z;
@@ -192,10 +186,7 @@ ML_INLINE int3 max(const int3& x, const int3& y) {
 
 union int4 {
     v4i xmm;
-
-    struct {
-        int32_t a[COORD_4D];
-    };
+    int32_t a[COORD_4D];
 
     struct {
         int32_t x, y, z, w;

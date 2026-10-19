@@ -275,6 +275,8 @@ const v4f c_v4f_Sign3 = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x80000000, 
 #define v4f_set(x, y, z, w) _mm_setr_ps(x, y, z, w)
 #define v4f_get(v, i)       _mm_cvtss_f32(_mm_castsi128_ps(_mm_srli_si128(_mm_castps_si128(v), 4 * i)))
 
+#define v4f_set000w(w) v4f_set(0.0f, 0.0f, 0.0f, w)
+
 #define v4f_setw1(x) _mm_or_ps(_mm_and_ps(x, c_v4f_FFF0), c_v4f_0001)
 #define v4f_setw0(x) _mm_and_ps(x, c_v4f_FFF0)
 
@@ -488,9 +490,12 @@ const v4d c_v4d_0001 = _mm256_setr_pd(0.0, 0.0, 0.0, 1.0);
 const v4d c_v4d_1111 = _mm256_set1_pd(1.0);
 const v4d c_v4d_Sign = _mm256_castsi256_pd(_mm256_set_epi32(0x80000000, 0x00000000, 0x80000000, 0x00000000, 0x80000000, 0x00000000, 0x80000000, 0x00000000));
 const v4d c_v4d_FFF0 = _mm256_castsi256_pd(_mm256_setr_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000));
+const v4d c_v4d_Sign3 = _mm256_and_pd(c_v4d_Sign, c_v4d_FFF0);
 
 #define v4d_set(x, y, z, w) _mm256_setr_pd(x, y, z, w)
 #define v4d_get(v, i)       _mm256_cvtsd_f64(_mm256_permute4x64_pd(v, _MM_SHUFFLE(0, 0, 0, i)))
+
+#define v4d_set000w(w) v4d_set(0.0, 0.0, 0.0, w)
 
 #define v4d_setw1(x) _mm256_or_pd(_mm256_and_pd(x, c_v4d_FFF0), c_v4d_0001)
 #define v4d_setw0(x) _mm256_and_pd(x, c_v4d_FFF0)
@@ -521,8 +526,9 @@ const v4d c_v4d_FFF0 = _mm256_castsi256_pd(_mm256_setr_epi32(0xFFFFFFFF, 0xFFFFF
 
 #define v4d_store_x(ptr, x) _mm_storel_pd(ptr, _mm256_extractf128_pd(x, 0))
 
-#define v4d_negate(v) _mm256_xor_pd(v, c_v4d_Sign)
-#define v4d_abs(v)    _mm256_andnot_pd(c_v4d_Sign, v)
+#define v4d_negate(v)  _mm256_xor_pd(v, c_v4d_Sign)
+#define v4d_negate3(v) _mm256_xor_pd(v, c_v4d_Sign3)
+#define v4d_abs(v)     _mm256_andnot_pd(c_v4d_Sign, v)
 
 #define _mm256_cmplt_pd(a, b)  _mm256_cmp_pd(a, b, _CMP_LT_OQ)
 #define _mm256_cmple_pd(a, b)  _mm256_cmp_pd(a, b, _CMP_LE_OQ)

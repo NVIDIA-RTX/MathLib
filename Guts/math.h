@@ -266,6 +266,7 @@ const v4f c_v4f_0001 = _mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f);
 const v4f c_v4f_1111 = _mm_set1_ps(1.0f);
 const v4f c_v4f_Sign = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
 const v4f c_v4f_FFF0 = _mm_castsi128_ps(_mm_setr_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000));
+const v4f c_v4f_Sign3 = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x80000000, 0x80000000, 0x00000000));
 
 #define v4f_mask_dp(xi, yi, zi, wi, xo, yo, zo, wo) (xo | (yo << 1) | (zo << 2) | (wo << 3) | (xi << 4) | (yi << 5) | (zi << 6) | (wi << 7))
 #define v4f_mask_dp4                                v4f_mask_dp(1, 1, 1, 1, 1, 1, 1, 1)
@@ -304,8 +305,9 @@ const v4f c_v4f_FFF0 = _mm_castsi128_ps(_mm_setr_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0
 
 #define v4f_store_x(ptr, x) _mm_store_ss(ptr, x)
 
-#define v4f_negate(v) _mm_xor_ps(v, c_v4f_Sign)
-#define v4f_abs(v)    _mm_andnot_ps(c_v4f_Sign, v)
+#define v4f_negate(v)  _mm_xor_ps(v, c_v4f_Sign)
+#define v4f_negate3(v) _mm_xor_ps(v, c_v4f_Sign3)
+#define v4f_abs(v)     _mm_andnot_ps(c_v4f_Sign, v)
 
 #define v4f_greater0_all(a) v4f_test4_all(_mm_cmpgt_ps(a, _mm_setzero_ps()))
 #define v4f_gequal0_all(a)  v4f_test4_all(_mm_cmpge_ps(a, _mm_setzero_ps()))

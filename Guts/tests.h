@@ -774,6 +774,20 @@ void ML_Tests() {
         }
     }
 
+    { // Rounding of large values, which are already integers
+        const float4 f(8388609.0f, -8388609.0f, 16777215.0f, 33554430.0f);
+        ML_Assert(all(floor(f) == f));
+        ML_Assert(all(round(f) == f));
+        ML_Assert(all(ceil(f) == f));
+        ML_Assert(all(frac(f) == float4(0.0f)));
+
+        const double4 d(4503599627370497.0, -4503599627370497.0, 9007199254740991.0, 18014398509481982.0);
+        ML_Assert(all(floor(d) == d));
+        ML_Assert(all(round(d) == d));
+        ML_Assert(all(ceil(d) == d));
+        ML_Assert(all(frac(d) == double4(0.0)));
+    }
+
     { // == and !=
         float x1 = (Rng::Hash::GetFloat(rngState) - 0.5f) * R;
         float y1 = (Rng::Hash::GetFloat(rngState) - 0.5f) * R;

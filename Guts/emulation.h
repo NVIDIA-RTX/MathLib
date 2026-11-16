@@ -173,8 +173,14 @@ ML_INLINE __m128 emu_mm_round_ps(const __m128& x) {
 
 template <>
 ML_INLINE __m128 emu_mm_round_ps<_MM_FROUND_TO_NEAREST_INT | ML_ROUNDING_EXEPTIONS_MASK>(const __m128& x) {
-    __m128 and0 = _mm_and_ps(_mm_castsi128_ps(_mm_set1_epi32(0x80000000)), x);
+    __m128 sign = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
+    __m128 and0 = _mm_and_ps(sign, x);
     __m128 or0 = _mm_or_ps(and0, _mm_set1_ps(8388608.0f));
+
+    // |x| >= 2^23 is already an integer (NaN and INF are kept too)
+    __m128 cmp0 = _mm_cmplt_ps(_mm_andnot_ps(sign, x), _mm_set1_ps(8388608.0f));
+    or0 = _mm_and_ps(or0, cmp0);
+
     __m128 add0 = _mm_add_ps(x, or0);
 
     return _mm_sub_ps(add0, or0);
@@ -211,8 +217,14 @@ ML_INLINE __m128d emu_mm_round_pd(const __m128d& x) {
 
 template <>
 ML_INLINE __m128d emu_mm_round_pd<_MM_FROUND_TO_NEAREST_INT | ML_ROUNDING_EXEPTIONS_MASK>(const __m128d& x) {
-    __m128d and0 = _mm_and_pd(_mm_castsi128_pd(_mm_set_epi32(0x80000000, 0x00000000, 0x80000000, 0x00000000)), x);
+    __m128d sign = _mm_castsi128_pd(_mm_set_epi32(0x80000000, 0x00000000, 0x80000000, 0x00000000));
+    __m128d and0 = _mm_and_pd(sign, x);
     __m128d or0 = _mm_or_pd(and0, _mm_set1_pd(4503599627370496.0));
+
+    // |x| >= 2^52 is already an integer (NaN and INF are kept too)
+    __m128d cmp0 = _mm_cmplt_pd(_mm_andnot_pd(sign, x), _mm_set1_pd(4503599627370496.0));
+    or0 = _mm_and_pd(or0, cmp0);
+
     __m128d add0 = _mm_add_pd(x, or0);
 
     return _mm_sub_pd(add0, or0);

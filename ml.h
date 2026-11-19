@@ -598,54 +598,16 @@ ML_INLINE T WaveTriangleSmooth(const T& x) {
     return CurveSmooth(WaveTriangle(x));
 }
 
+// Round toward positive infinity to the closest float >= dValue.
 ML_INLINE float DoubleToGequal(double dValue) {
     float fValue = (float)dValue;
-    float fError = (float)(dValue - fValue);
-
-    int32_t exponent = 0;
-    frexp(fValue, &exponent);
-    exponent = max(exponent, 0);
-    exponent = (int32_t)log10f(float(1 << exponent));
-
-    float fStep = 1.0f / pow(10.0f, float(7 - exponent));
-
-    while (fError > 0.0f) {
-        fValue += fStep;
-
-        float fCurrError = float(dValue - fValue);
-
-        if (fCurrError == fError)
-            fStep += fStep;
-        else
-            fError = fCurrError;
-    }
-
-    return fValue;
+    return fValue < dValue ? nextafterf(fValue, HUGE_VALF) : fValue;
 }
 
+// Round toward negative infinity to the closest float <= dValue.
 ML_INLINE float DoubleToLequal(double dValue) {
     float fValue = (float)dValue;
-    float fError = (float)(dValue - fValue);
-
-    int32_t exponent = 0;
-    frexp(fValue, &exponent);
-    exponent = max(exponent, 0);
-    exponent = (int32_t)log10f(float(1 << exponent));
-
-    float fStep = 1.0f / pow(10.0f, float(7 - exponent));
-
-    while (fError < 0.0f) {
-        fValue -= fStep;
-
-        float fCurrError = float(dValue - fValue);
-
-        if (fCurrError == fError)
-            fStep += fStep;
-        else
-            fError = fCurrError;
-    }
-
-    return fValue;
+    return fValue > dValue ? nextafterf(fValue, -HUGE_VALF) : fValue;
 }
 
 //======================================================================================================================

@@ -1,5 +1,7 @@
 // © 2021 NVIDIA Corporation
 
+#include <cfloat>
+
 #define Test_Eps         0.00001
 #define Test_ConstantEps 0.001 // hack for "fmod"
 
@@ -54,6 +56,37 @@ namespace ml {
 #endif
 
 void ML_Tests() {
+    { // Directed double-to-float rounding: bounds must be the closest representable floats.
+        const double inf = HUGE_VAL;
+        const double nan = std::nan("");
+        const double tiny = ldexp(1.0, -149);
+        const double normal = FLT_MIN;
+        const double large = FLT_MAX;
+        const double values[] = {
+            0.0, -0.0, 1.0, -1.0, 1.00000001, -1.00000001,
+            1e-300, -1e-300, tiny, -tiny, tiny * 0.5, -tiny * 0.5,
+            nextafter(tiny, inf), nextafter(-tiny, -inf),
+            normal, -normal, nextafter(normal, 0.0), nextafter(-normal, 0.0),
+            large, -large, nextafter(large, inf), nextafter(-large, -inf),
+            DBL_MAX, -DBL_MAX, inf, -inf,
+        };
+
+        for (double value : values) {
+            const float upper = DoubleToGequal(value);
+            const float lower = DoubleToLequal(value);
+            ML_Assert(upper >= value);
+            ML_Assert(lower <= value);
+            ML_Assert(upper == -inf || nextafterf(upper, -HUGE_VALF) < value);
+            ML_Assert(lower == inf || nextafterf(lower, HUGE_VALF) > value);
+        }
+
+        ML_Assert(std::isnan(DoubleToGequal(nan)));
+        ML_Assert(std::isnan(DoubleToLequal(nan)));
+        ML_Assert(std::signbit(DoubleToGequal(-0.0)));
+        ML_Assert(std::signbit(DoubleToLequal(-0.0)));
+        ML_Assert(!std::signbit(DoubleToGequal(0.0)));
+        ML_Assert(!std::signbit(DoubleToLequal(0.0)));
+    }
     { // Quatf arithmetic and construction
         const Quatf identity(1.0f);
         const Quatf a(1.0f, 2.0f, 3.0f, 4.0f);
